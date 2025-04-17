@@ -127,9 +127,13 @@ if (!isset($_SESSION["email"])){
 
                 while ($registro = $resultado->fetch()) {
                     echo "<tr>" . PHP_EOL;
-                    echo "<td>$registro[nombre] $registro[apellidos]</td>
-                        <td rowspan='2'><img class='avatar' src='..$registro[img]' alt='Foto perfil usuario$registro[id_usuario]'/></td> 
-                        <td rowspan='2'>    
+                    echo "<td>$registro[nombre] $registro[apellidos]</td>";
+                    if ($registro["img"] != null) {
+                        echo "<td rowspan='2'><img class='avatar' src='..$registro[img]' alt='Foto perfil usuario$registro[id_usuario]'/></td>" ;
+                    }else{
+                        echo "<td rowspan='2'><img class='avatar' src='../img/avatar.svg' alt='Foto avatar'/></td>" ; 
+                    }                         
+                    echo   "<td rowspan='2'>    
                             <a href='../usuarios/modificar.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Modificar</button></a>
                             <a href='../usuarios/eliminar.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Eliminar</button></a>
                         </td>" . PHP_EOL;
