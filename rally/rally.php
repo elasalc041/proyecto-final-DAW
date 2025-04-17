@@ -29,7 +29,7 @@ if (isset($_SESSION["email"])){
 	// Guardo el rol y el id
 	$perfil = (int) $resultado["rol_id"];
 
-	$id = $resultado["id_usuario"];
+	$usuario = $resultado["id_usuario"];
 
 	$nombre = $resultado["nombre"];
 
@@ -40,7 +40,7 @@ if (isset($_SESSION["email"])){
 	$consulta2 = $conexion->prepare($consulta2);
 
 	$consulta2->execute([
-		"usuarioId" => $id,
+		"usuarioId" => $usuario,
 	]);       
 			   
 	while ($registro = $consulta2->fetch(PDO::FETCH_ASSOC)) {
@@ -58,7 +58,7 @@ if (count($_REQUEST) > 0)
 {
 
 	//si ha venido a través del enlace con la id del rally
-	if (!isset($_GET["id"]))
+	if (!isset($_GET["rally"]))
 	{
 		//Evitar que se pueda entrar directamente a la página
 		header("Location: ../index.php");
@@ -67,7 +67,7 @@ if (count($_REQUEST) > 0)
 	else 
 	{
 
-		$rally = $_GET["id"];
+		$rally = $_GET["rally"];
 
 		$conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
@@ -166,7 +166,7 @@ if (count($_REQUEST) > 0)
 					$consulta = $conexion->prepare($select);
 
 					$consulta->bindParam(":rally", $rally);
-					$consulta->bindParam(":usuario", $id);
+					$consulta->bindParam(":usuario", $usuario);
 
 					$consulta->execute();
 					
@@ -190,7 +190,9 @@ if (count($_REQUEST) > 0)
 							echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;							
 							echo "<p>Estado $resultado[estado]</p>" . PHP_EOL;
 							echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
-							echo "<a href='../usuarios/eliminarFoto.php?id=$resultado[id_foto]' class='estilo_enlace'><button>Eliminar</button></a>" . PHP_EOL;
+							if ($resultado["estado"] !== "aceptada") {
+								echo "<a href='../usuarios/eliminarFoto.php?id=$resultado[id_foto]' class='estilo_enlace'><button>Eliminar</button></a>" . PHP_EOL;
+							}							
 							echo "</article>". PHP_EOL;
 							
 						} 
@@ -226,7 +228,7 @@ if (count($_REQUEST) > 0)
 						echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;
 						echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
 						echo "<p>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
-						echo "<button>Votar</button>" . PHP_EOL;
+						echo "<a href='votar.php?id=$resultado[id_foto]' class='estilo_enlace'><button>Votar</button></a>" . PHP_EOL;
 						echo "</article>". PHP_EOL;
 					}
 				} 

@@ -149,7 +149,7 @@ session_start();
                 while ($registro = $resultado->fetch(PDO::FETCH_ASSOC)) {                
                         //solo mostrar rallies que no hayan terminado  
                         if ($registro["fecha_fin"] > $fechaActual) {
-                            echo "<a href='rally/rally.php?id=$registro[id_rally]' class='estilo_enlace'>" . PHP_EOL;
+                            echo "<a href='rally/rally.php?rally=$registro[id_rally]' class='estilo_enlace'>" . PHP_EOL;
                             echo "<article class='tarjeta'>" . PHP_EOL;
                             if ($registro["img"] != null) {
                                 echo "<img src='$registro[img]' alt='Foto del rally'></img>" . PHP_EOL;

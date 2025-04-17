@@ -13,20 +13,18 @@ if (!isset($_SESSION["email"])){
     //obtener el perfil del usuario
     $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-    $consulta = "select * FROM gestores WHERE email = :email;";
+    $consulta = "SELECT * FROM usuarios WHERE email = :email";
 
     $consulta = $conexion->prepare($consulta);
 
-    // Ejecuta consulta
     $consulta->execute([
         "email" => $email
     ]);
 
-    // Guardo el resultado
     $resultado = $consulta->fetch();
 
     // Guardo el perfil
-    $perfil = (int) $resultado["perfil_id"];
+    $perfil = (int) $resultado["rol_id"];
 
     // Comprueba que el rol sea "Admin", en caso contrario vuelve a la página inicial
 	if ($perfil !== 1) {
@@ -42,217 +40,121 @@ if (!isset($_SESSION["email"])){
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listados</title>
+    <title>Vista Administrador</title>
     <link rel="stylesheet" type="text/css" href="../css/estilos.css">
 </head>
 <body>
-    <h1>Listado de USUARIOS</h1>
+    <header>
+        <nav>
+            <a href='../index.php' class='estilo_enlace'><button>Volver</button></a>
+            <a href="../ControlAcceso/cerrar-sesion.php" class='estilo_enlace'><button>Salir</button></a>
+        </nav>
+	</header>
+    <main class="contenido">
+        <section class="fotos">
+            <h1>Fotos pendientes de validación</h1>
+            <?php
+			//fotos pendientes de validación
+            $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-    <?php
-        // Realiza la conexion a la base de datos a través de una función 
+			$select = "SELECT * FROM fotos WHERE estado = 'pendiente' ORDER BY fecha asc";
 
-        $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
+			$consulta = $conexion->query($select);
+
+			$consulta->execute();
+
+			// comprobamos si algún registro 
+			if ($consulta->rowCount() == 0)
+			{
+				echo "<h3>Ninguna foto pendiente de validar</h3>" . PHP_EOL;
+			}else{
+				while ($resultado = $consulta->fetch(PDO::FETCH_ASSOC)) {
+					echo "<article class='foto'>" . PHP_EOL;
+					echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;
+					echo "<p>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
+					echo "<a href='revisar.php?id=$resultado[id_foto]&validar=1' class='estilo_enlace'><button>Validar</button></a>" . PHP_EOL;
+                    echo "<a href='revisar.php?id=$resultado[id_foto]&validar=0' class='estilo_enlace'><button>Rechazar</button></a>" . PHP_EOL;
+					echo "</article>". PHP_EOL;
+				}					
+			}
+			
+			?>
+        </section>
+        <section class="tabla-rallies">
+            <h1>Rallies</h1>
+            <a href="../rally/nuevo.php"><button>Nuevo rally</button></a>  
+            <table border="1" cellpadding="10">
+                <tbody>
+            <?php
+
+                $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
         
-        // Realiza la consulta a ejecutar en la base de datos en una variable
-
-        $consulta = "SELECT usuarios.id, nombre, email, perfil, activo, usuarios.created_at, usuarios.updated_at FROM usuarios, perfiles 
-        WHERE perfil_id = perfiles.id";
+                $consulta = "SELECT id_rally, fecha_ini, fecha_fin, titulo, participantes, count(usuario_id) as registrados FROM rally 
+                INNER JOIN inscripciones ON id_rally = rally_id 
+                ORDER BY fecha_fin desc";
         
-        // Obten el resultado de ejecutar la consulta para poder recorrerlo. El resultado es de tipo PDOStatement
+                $resultado = resultadoConsulta($conexion, $consulta);
+
+                while ($registro = $resultado->fetch()) {
+                    echo "<tr>" . PHP_EOL;
+                    echo "<td>$registro[titulo] $registro[fecha_ini] | $registro[fecha_fin]</td> 
+                        <td rowspan='2'>    
+                            <a href='../rally/modificar.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Modificar</button></a>
+                            <a href='../rally/eliminar.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Eliminar</button></a>
+                            <a href='../rally/rally.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Ir</button></a> 
+                        </td>" . PHP_EOL;
+                    echo "</tr>". PHP_EOL;
+                    echo "<tr>" . PHP_EOL;
+                    echo "<td>Límite participantes: $registro[participantes] -- Usuarios inscritos: $registro[registrados]</td>" . PHP_EOL;
+                    echo "</tr>". PHP_EOL;
+                }
+
+            ?>    
+                </tbody>
+            </table>
+        </section>
+
+        <section class="tabla-usuarios">
+            <h1>Usuarios</h1>
+            <a href="../usuarios/nuevo.php"><button>Nuevo usuario</button></a>  
+            <table border="1" cellpadding="10">
+                <tbody>
+            <?php
         
-        $resultado = resultadoConsulta($conexion, $consulta);
-
-    ?>
-        <table border="1" cellpadding="10">
-            <thead>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Perfil</th>
-                <th>Activo</th>
-                <th>Fecha de Alta</th>
-                <th>Última Modificación</th>
-                <th>Acciones</th>
-            </thead>
-            <tbody>
-                
-                <!-- Muestra los datos -->
-
-        <?php
-        $resultado->bindColumn(1, $id);
-        $resultado->bindColumn(2, $nombre);
-        $resultado->bindColumn(3, $email);
-        $resultado->bindColumn(4, $perfil);
-        $resultado->bindColumn(5, $activo);
-        $resultado->bindColumn(6, $fecha_alta);
-        $resultado->bindColumn(7, $fecha_modif);
-
-
-        while ($registro = $resultado->fetch(PDO::FETCH_BOUND)) {
-            echo "<tr>" . PHP_EOL;
-            echo "<td>$id</td> <td>$nombre</td> <td>$email</td> <td>$perfil</td> <td>$activo</td>  <td>$fecha_alta</td> <td>$fecha_modif</td>
-            <td>    <a href='modificarUsuario.php?usuarioId=$id' class='estilo_enlace'>&#9998</a>
-                    <a href='borrarUsuario.php?usuarioId=$id' class='confirmacion_borrar'>&#128465</a>  </td>" . PHP_EOL;
-            echo "</tr>". PHP_EOL;
-        }
-    ?>
-                
-            </tbody>
-        </table>
-
-
-        <div class="contenedor">
-            <div class="enlaces">
-                <a href="../registro/formularioUsuario.php">Nuevo usuario</a>
-            </div>
-        </div>
-
-
-    <h1>Listado de GESTORES</h1>
-
-    <?php
-        // Realiza la conexion a la base de datos a través de una función 
-
-        $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
+                $consulta = "SELECT id_usuario, nombre, apellidos, email, tfno, fecha, img FROM usuarios WHERE rol_id = 2";
         
-        // Realiza la consulta a ejecutar en la base de datos en una variable
+                $resultado = resultadoConsulta($conexion, $consulta);
 
-        $consulta = "SELECT gestores.id, nombre, email, perfil, gestores.created_at, gestores.updated_at FROM gestores, perfiles 
-        WHERE perfil_id = perfiles.id AND perfil_id != 1";
-        
-        // Obten el resultado de ejecutar la consulta para poder recorrerlo. El resultado es de tipo PDOStatement
-        
-        $resultado = resultadoConsulta($conexion, $consulta);
+                while ($registro = $resultado->fetch()) {
+                    echo "<tr>" . PHP_EOL;
+                    echo "<td>$registro[nombre] $registro[apellidos]</td>
+                        <td rowspan='2'><img class='avatar' src='..$registro[img]' alt='Foto perfil usuario$registro[id_usuario]'/></td> 
+                        <td rowspan='2'>    
+                            <a href='../usuarios/modificar.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Modificar</button></a>
+                            <a href='../usuarios/eliminar.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Eliminar</button></a>
+                        </td>" . PHP_EOL;
+                    echo "</tr>". PHP_EOL;
+                    echo "<tr>" . PHP_EOL;
+                    echo "<td>$registro[email] -- $registro[tfno]</td>" . PHP_EOL;
+                    echo "</tr>". PHP_EOL;
+                }
 
-    ?>
-        <table border="1" cellpadding="10">
-            <thead>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Perfil</th>
-                <th>Fecha de Alta</th>
-                <th>Última Modificación</th>
-                <th>Acciones</th>
-            </thead>
-            <tbody>
-                
-                <!-- Muestra los datos -->
-
-        <?php
-        $resultado->bindColumn(1, $id);
-        $resultado->bindColumn(2, $nombre);
-        $resultado->bindColumn(3, $email);
-        $resultado->bindColumn(4, $perfil);
-        $resultado->bindColumn(5, $fecha_alta);
-        $resultado->bindColumn(6, $fecha_modif);
-
-
-        while ($registro = $resultado->fetch(PDO::FETCH_BOUND)) {
-            echo "<tr>" . PHP_EOL;
-            echo "<td>$id</td> <td>$nombre</td> <td>$email</td> <td>$perfil</td> <td>$fecha_alta</td> <td>$fecha_modif</td>
-                <td> <a href='modificarGestor.php?gestorId=$id' class='estilo_enlace'>&#9998</a>
-                    <a href='borrarGestor.php?gestorId=$id' class='confirmacion_borrar'>&#128465</a>  </td>" . PHP_EOL;
-            echo "</tr>". PHP_EOL;
-        }
-    ?>
-                
-            </tbody>
-        </table>
-
-
-
-
-        <div class="contenedor">
-            <div class="enlaces">
-                <a href="../registro/formularioGestor.php">Nuevo gestor</a>
-            </div>
-        </div>
-
-
-        <h1>Listado de OFERTAS</h1>
-
-    <?php
-        // Realiza la conexion a la base de datos a través de una función 
-
-        $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
-        
-        // Realiza la consulta a ejecutar en la base de datos en una variable
-
-        $consulta = "SELECT o.id, usuario_id, nombre, categoria, descripcion, fecha_actividad, aforo, visada, o.created_at, o.updated_at  
-                FROM ofertas o INNER JOIN categorias c ON categoria_id = c.id ORDER BY fecha_actividad DESC";
-        
-        // Obten el resultado de ejecutar la consulta para poder recorrerlo. El resultado es de tipo PDOStatement
-        
-        $resultado = resultadoConsulta($conexion, $consulta);
-
-    ?>
-        <table border="1" cellpadding="10">
-            <thead>
-                <th>ID</th>
-                <th>Ofertante</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Descripción</th>
-                <th>Fecha Actividad</th>
-                <th>Aforo</th>
-                <th>Revisada</th>
-                <th>Fecha de Alta</th>
-                <th>Última Modificación</th>
-                <th>Acciones</th>
-            </thead>
-            <tbody>
-                
-                <!-- Muestra los datos -->
-
-        <?php
-        $resultado->bindColumn(1, $id);
-        $resultado->bindColumn(2, $usuario);
-        $resultado->bindColumn(3, $nombre);
-        $resultado->bindColumn(4, $categoria);
-        $resultado->bindColumn(5, $descripcion);
-        $resultado->bindColumn(6, $fechaActividad);
-        $resultado->bindColumn(7, $aforo);
-        $resultado->bindColumn(8, $visada);
-        $resultado->bindColumn(9, $fecha_alta);
-        $resultado->bindColumn(10, $fecha_modif);
-
-
-        while ($registro = $resultado->fetch(PDO::FETCH_BOUND)) {
-            echo "<tr>" . PHP_EOL;
-            echo "<td>$id</td> <td>$usuario</td> <td>$nombre</td> <td>$categoria</td> <td>$descripcion</td> <td>$fechaActividad</td> <td>$aforo</td> <td>$visada</td> 
-            <td>$fecha_alta</td> <td>$fecha_modif</td>
-            <td>    <a href='modificarOferta.php?ofertaId=$id' class='estilo_enlace'>&#9998</a>
-                    <a href='borrarOferta.php?ofertaId=$id' class='confirmacion_borrar'>&#128465</a>  </td>" . PHP_EOL;
-            echo "</tr>". PHP_EOL;
-        }
-    ?>
-                
-            </tbody>
-        </table>
-
-
-
-
-        <div class="contenedor">
-            <div class="enlaces">
-                <a href="nuevaOferta.php">Nueva oferta</a>
-                <p>    
-                     <a href="../ControlAcceso/cerrar-sesion.php">Cerrar sesión</a>
-                                     
-                    <a href="../index.php">Volver a página de inicio</a>
-                 </p>
-            </div>
-        </div>
+            ?>    
+                </tbody>
+            </table>
+        </section>
+    </main>
 
     
     <?php
-
-        // Libera el resultado y cierra la conexión
+            // Libera el resultado y cierra la conexión
     
         $resultado = null;
         $conexion = null;
+
+        include '../utiles/footer.php';
     ?>
+    
 </body>
 </html>
 
