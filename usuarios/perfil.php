@@ -155,7 +155,8 @@ if (!isset($_SESSION["email"])) {
                                
                                 //obtener posición de la foto con más puntos del usuario para cada rally
                                $consulta2 = "SELECT usuario_id FROM fotos 
-                               ORDER BY puntos DESC WHERE rally_id = $registro[id_rally]";
+                               WHERE rally_id = $registro[id_rally]
+                               ORDER BY puntos DESC";
 
                                $resultado2 = resultadoConsulta($conexion, $consulta2);
 

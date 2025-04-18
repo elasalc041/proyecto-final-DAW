@@ -72,6 +72,7 @@ if (!isset($_SESSION["email"])){
 					echo "<article class='foto'>" . PHP_EOL;
 					echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;
 					echo "<p>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
+                    echo "<p>Rally $resultado[rally_id]</p>" . PHP_EOL;
 					echo "<a href='revisar.php?id=$resultado[id_foto]&validar=1' class='estilo_enlace'><button>Validar</button></a>" . PHP_EOL;
                     echo "<a href='revisar.php?id=$resultado[id_foto]&validar=0' class='estilo_enlace'><button>Rechazar</button></a>" . PHP_EOL;
 					echo "</article>". PHP_EOL;
@@ -89,15 +90,14 @@ if (!isset($_SESSION["email"])){
 
                 $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
         
-                $consulta = "SELECT id_rally, fecha_ini, fecha_fin, titulo, participantes, count(usuario_id) as registrados FROM rally 
-                INNER JOIN inscripciones ON id_rally = rally_id 
-                ORDER BY fecha_fin desc";
+                $consulta = "SELECT r.*, count(i.usuario_id) as registrados FROM rally r
+                LEFT JOIN inscripciones i ON r.id_rally = i.rally_id GROUP BY r.id_rally";
         
                 $resultado = resultadoConsulta($conexion, $consulta);
 
                 while ($registro = $resultado->fetch()) {
                     echo "<tr>" . PHP_EOL;
-                    echo "<td>$registro[titulo] $registro[fecha_ini] | $registro[fecha_fin]</td> 
+                    echo "<td>Rally $registro[id_rally] $registro[titulo]</td> 
                         <td rowspan='2'>    
                             <a href='../rally/modificar.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Modificar</button></a>
                             <a href='../rally/eliminar.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Eliminar</button></a>
@@ -105,7 +105,8 @@ if (!isset($_SESSION["email"])){
                         </td>" . PHP_EOL;
                     echo "</tr>". PHP_EOL;
                     echo "<tr>" . PHP_EOL;
-                    echo "<td>Límite participantes: $registro[participantes] -- Usuarios inscritos: $registro[registrados]</td>" . PHP_EOL;
+                    echo "<td>$registro[fecha_ini] | $registro[fecha_fin].  $registro[localidad]
+                    Límite participantes: $registro[participantes] -- Usuarios inscritos: $registro[registrados]</td>" . PHP_EOL;
                     echo "</tr>". PHP_EOL;
                 }
 
@@ -129,7 +130,7 @@ if (!isset($_SESSION["email"])){
                     echo "<tr>" . PHP_EOL;
                     echo "<td>$registro[nombre] $registro[apellidos]</td>";
                     if ($registro["img"] != null) {
-                        echo "<td rowspan='2'><img class='avatar' src='..$registro[img]' alt='Foto perfil usuario$registro[id_usuario]'/></td>" ;
+                        echo "<td rowspan='2'><img class='avatar' src='../$registro[img]' alt='Foto perfil usuario$registro[id_usuario]'/></td>" ;
                     }else{
                         echo "<td rowspan='2'><img class='avatar' src='../img/avatar.svg' alt='Foto avatar'/></td>" ; 
                     }                         

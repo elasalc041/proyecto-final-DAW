@@ -71,8 +71,8 @@ if (count($_REQUEST) > 0)
 
 		$conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-		$select = "SELECT titulo, descripcion, fecha_ini, fecha_fin, participantes, count(usuario_id) as registrados, img, lim_fotos, tam_foto, formato_foto 
-                FROM rally INNER JOIN inscripciones ON id_rally = rally_id WHERE id_rally = :id";
+		$select = "SELECT r.*, count(i.usuario_id) as registrados FROM rally r
+                LEFT JOIN inscripciones i ON r.id_rally = i.rally_id WHERE r.id_rally = :id GROUP BY r.id_rally";
 
 		$consulta = $conexion->prepare($select);
 
@@ -137,7 +137,8 @@ if (count($_REQUEST) > 0)
 			<?php			
 		//datos del rally
 			echo "
-			<p>Fecha de inicio: " . formatoFecha($registro["fecha_ini"]) . ". Fecha fin del concurso: " . formatoFecha($registro["fecha_fin"]) . ".</p> 
+			<p>Fecha de inicio: " . formatoFecha($registro["fecha_ini"]) . ". Fecha fin del concurso: " . formatoFecha($registro["fecha_fin"]) . "
+			- $registro[localidad].</p> 
 			<p>$registro[descripcion]</p>" . PHP_EOL;
 			
 			echo "<a href='ranking.php?id=$rally' class='estilo_enlace'><button>Ranking</button></a>". PHP_EOL;
@@ -206,9 +207,9 @@ if (count($_REQUEST) > 0)
 			<?php
 			echo "<h1>Fotos de $registro[titulo]</h1>" . PHP_EOL;
 			//fotos generales del rally
-			$select = "SELECT f.*, nombre, apellidos FROM fotos f INNER JOIN usuarios u 
-			ON usuario_id = id_usuario
-			WHERE rally_id = :id ORDER BY fecha desc";
+			$select = "SELECT f.*, u.nombre, u.apellidos FROM fotos f JOIN usuarios u 
+			ON f.usuario_id = u.id_usuario
+			WHERE f.rally_id = :id ORDER BY fecha desc";
 
 			$consulta = $conexion->prepare($select);
 

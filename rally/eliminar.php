@@ -14,7 +14,7 @@ if (!isset($_SESSION["email"])){
 	//obtener el id del usuario
     $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-    $consulta = "select * FROM gestores WHERE email = :email;";
+    $consulta = "select * FROM usuarios WHERE email = :email;";
 
     $consulta = $conexion->prepare($consulta);
 
@@ -27,7 +27,7 @@ if (!isset($_SESSION["email"])){
     $resultado = $consulta->fetch();
 
     // Guardo el perfil
-    $perfil = (int) $resultado["perfil_id"];
+    $perfil = (int) $resultado["rol_id"];
 
 
 	if ($perfil != 1) {
@@ -45,26 +45,29 @@ if (!isset($_SESSION["email"])){
         if (count($_REQUEST) > 0)
         {
 
-            if (isset($_GET["ofertaId"]))
+            if (isset($_GET["rally"]))
             {
                 $exito = false;
 
-                $oferta = $_GET["ofertaId"];
+                $rally = $_GET["rally"];
 
                 $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-                $consulta = "DELETE FROM ofertas WHERE id = :id";
+                $consulta = "DELETE FROM rally WHERE id_rally = :id";
 
                 $resultado = $conexion->prepare($consulta);
 
-                $resultado->bindParam(":id", $oferta);
+                $resultado->bindParam(":id", $rally);
 
                 try {
                     $resultado->execute();
                     $resultado = null;
-                    $conexion = null;
-
+                    $conexion = null;   
+                    
                     $exito = true;
+
+                    borrarDirectorio("../uploads/rallies/$rally");
+
                 } catch (PDOException $e) {
                     exit($e->getMessage());
                 }
@@ -72,20 +75,20 @@ if (!isset($_SESSION["email"])){
                 //Si todo ha ido bien, mostrar mensaje
                 if ($exito) 
                 {  
-                    echo "Oferta borrada con éxito";              
+                    echo "Rally borrado con éxito";              
                 } 
                 //Si no ha ido bien, mostrar mensaje 
                 else 
                 {
-                    echo "No se ha podido borrar la oferta";
+                    echo "No se ha podido borrar el rally";
                 }
                 
                 //En ambos casos, redireccionar al listado original tras 3 segundos.
-                header("refresh:3;url=listados.php");
+                header("refresh:3;url=../administrador/listados.php");
                 exit();
             } 
         } 
-            //Evitar que se pueda entrar directamente a la página .../borrar.php, redireccionando
+            //Evitar que se pueda entrar directamente a la página , redireccionando
         else 
         {
             header("Location: ../index.php");

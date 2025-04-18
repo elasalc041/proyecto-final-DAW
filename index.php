@@ -120,9 +120,9 @@ session_start();
         $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
         // consulta para obtener rallies
-
-       $consulta = "SELECT id_rally, titulo, fecha_ini, fecha_fin, participantes, count(usuario_id) as registrados, img 
-                FROM rally INNER JOIN inscripciones ON id_rally = rally_id ORDER BY fecha_ini DESC";
+        
+        $consulta = "SELECT r.*, count(i.usuario_id) as registrados FROM rally r
+                LEFT JOIN inscripciones i ON r.id_rally = i.rally_id GROUP BY r.id_rally ORDER BY fecha_ini DESC";
 
         // Obten el resultado de ejecutar la consulta para poder recorrerlo. El resultado es de tipo PDOStatement
 

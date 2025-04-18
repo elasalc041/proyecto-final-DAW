@@ -75,6 +75,7 @@ if (!isset($_SESSION["email"])){
 					$descripcion = $registro["descripcion"];
 					$tfno = $registro["tfno"];
 					$token = $registro["token"];
+					$rutaFoto = $registro["img"];
 
 					$consulta = null;
 					$conexion = null;	        
@@ -92,6 +93,7 @@ if (!isset($_SESSION["email"])){
 				$descripcion = obtenerValorCampo("descripcion");
 				$tfno = obtenerValorCampo("tfno");
 				$token = obtenerValorCampo("token");
+				$rutaFoto = obtenerValorCampo("imagen_actual");
 			 
 
 				 //-----------------------------------------------------
@@ -145,12 +147,11 @@ if (!isset($_SESSION["email"])){
 				
 				
 				// Comprobación de imagen subida
-				$rutaFinal = null;			
 
 				if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == UPLOAD_ERR_OK) {
-					$directorioSubida = "/uploads/usuarios/$usuario/perfil/";
+					$directorioSubida = "uploads/usuarios/$usuario/perfil/";
 					$nombreOriginal = basename($_FILES['imagen']['name']);
-					$rutaFinal = $directorioSubida . $nombreOriginal;
+					$rutaFoto = $directorioSubida . $nombreOriginal;
 
 					
 					// Generamos nombre único
@@ -166,7 +167,7 @@ if (!isset($_SESSION["email"])){
 					} elseif ($_FILES['imagen']['size'] > 2 * 1024 * 1024) {
 						$errores['imagen'] = "La imagen no puede superar los 2MB.";
 					} else {
-						move_uploaded_file($_FILES['imagen']['tmp_name'], "../$rutaFinal");
+						move_uploaded_file($_FILES['imagen']['tmp_name'], "../$rutaFoto");
 					}
 				}
 
@@ -195,6 +196,7 @@ if (!isset($_SESSION["email"])){
   		<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
 	    	<input type="hidden" name="id" value="<?php echo $usuario ?>">
 			<input type="hidden" name="token" value="<?php echo $token ?>">
+			<input type="hidden" name="imagen_actual" value="<?php echo $rutaFoto ?>">
 	    	<p>
 	            <!-- Campo nombre -->
 				<label for="nombre">Nombre: </label>
@@ -281,7 +283,7 @@ if (!isset($_SESSION["email"])){
 			$resultado->bindParam(":apellidos", $apellidos);
 			$resultado->bindParam(":descripcion", $descripcion);
 			$resultado->bindParam(":tfno", $tfno);
-			$resultado->bindParam(":foto", $rutaFinal);
+			$resultado->bindParam(":foto", $rutaFoto);
 			$resultado->bindParam(":id", $usuario);
 
 			// ejecutamos la consulta 

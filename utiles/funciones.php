@@ -100,14 +100,40 @@
 
         /**
     * Método que valida si el formato fecha es correcto y posterior a fecha actual
-    * @param {string} - Fecha a validar en formato aaaa-mm-dd hh-mm-ss
+    * @param {string} - Fecha a validar en formato aaaa-mm-dd
     * @return {boolean}
     */
-    function validarFecha($date, $format = 'Y-m-d H:i:s')
+    function validarFecha($date, $format = 'Y-m-d H:i:s'): bool 
 {
     $d = DateTime::createFromFormat($format, $date);
     return $d && $d->format($format) == $date && $date > date('Y-m-d');
 }
+
+    /**
+    * Método que valida si el formato fecha es correcto, posterior a fecha actual y una fecha es anterior a al otra
+    * @param {string} - Fecha a validar en formato aaaa-mm-dd
+    * @param {string} - Fecha a validar en formato aaaa-mm-dd
+    * @return {boolean}
+    */
+
+    function validarDosFechas($fecha1, $fecha2) {
+      $f1 = DateTime::createFromFormat('Y-m-d', $fecha1);
+      $f2 = DateTime::createFromFormat('Y-m-d', $fecha2);
+      $hoy = new DateTime(); // Fecha actual
+
+      // Validar que ambas fechas sean válidas
+      if (!$f1 || !$f2) {
+          return false;
+      }
+
+      // Verificar que ambas fechas sean futuras
+      if ($f1 <= $hoy || $f2 <= $hoy) {
+          return false;
+      }
+
+      // Verificar que la primera fecha sea anterior o igual a la segunda
+      return $f1 <= $f2;
+    }
 
 
 
@@ -169,6 +195,27 @@
   $fechaFormateada = implode("-", array_reverse($array));
   return  $fechaFormateada;
 }
+
+  /**
+      * Método que elimina un directorio dado a través  de la ruta y todo su contenido 
+      * @param {string} - Ruta del directorio
+      * @return {bool} - 
+      */
+  function borrarDirectorio($ruta) {
+    if (!is_dir($ruta)) return false;
+
+    $archivos = array_diff(scandir($ruta), ['.', '..']);
+    foreach ($archivos as $archivo) {
+        $archivoRuta = $ruta . DIRECTORY_SEPARATOR . $archivo;
+        if (is_dir($archivoRuta)) {
+            borrarDirectorio($archivoRuta); // Llamada recursiva
+        } else {
+            unlink($archivoRuta); // Borra archivo
+        }
+    }
+
+    return rmdir($ruta); // Finalmente, borra el directorio
+  }
 
 
 
