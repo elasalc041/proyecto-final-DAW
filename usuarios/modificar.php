@@ -20,8 +20,7 @@ if (!isset($_SESSION["email"])){
     <link rel="stylesheet" type="text/css" href="../css/estilos.css">
 </head>
 <body>
-<body>
-	
+<body>	
 	<header>
         <nav>
             <a href='perfil.php' class='estilo_enlace'><button>Volver</button></a>

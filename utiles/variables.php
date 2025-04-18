@@ -4,8 +4,8 @@
 	//$host = "172.26.104.205";
     //casa
     $host = "localhost";
-	$user = "pepito01";
-	$passwordBD = "pepito01";
+	$user = "root";
+	$passwordBD = "";
 	$bbdd = "rallies_fotos";
 
 

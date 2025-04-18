@@ -117,7 +117,7 @@ if (!isset($_SESSION["email"])){
 
         <section class="tabla-usuarios">
             <h1>Usuarios</h1>
-            <a href="../usuarios/nuevo.php"><button>Nuevo usuario</button></a>  
+            <a href="nuevoUsuario.php"><button>Nuevo usuario</button></a>  
             <table border="1" cellpadding="10">
                 <tbody>
             <?php
@@ -135,7 +135,7 @@ if (!isset($_SESSION["email"])){
                         echo "<td rowspan='2'><img class='avatar' src='../img/avatar.svg' alt='Foto avatar'/></td>" ; 
                     }                         
                     echo   "<td rowspan='2'>    
-                            <a href='../usuarios/modificar.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Modificar</button></a>
+                            <a href='modificarUsuario.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Modificar</button></a>
                             <a href='../usuarios/eliminar.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Eliminar</button></a>
                         </td>" . PHP_EOL;
                     echo "</tr>". PHP_EOL;

@@ -13,7 +13,7 @@ if (!isset($_SESSION["email"])){
 	//obtener el id del usuario
     $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-    $consulta = "select * FROM gestores WHERE email = :email;";
+    $consulta = "select * FROM usuarios WHERE email = :email;";
 
     $consulta = $conexion->prepare($consulta);
 
@@ -26,7 +26,7 @@ if (!isset($_SESSION["email"])){
     $resultado = $consulta->fetch();
 
     // Guardo el perfil
-    $perfil = (int) $resultado["perfil_id"];
+    $perfil = (int) $resultado["rol_id"];
 
 
 	if ($perfil != 1) {
@@ -50,6 +50,13 @@ if (!isset($_SESSION["email"])){
 </head>
 <body>
 <body>
+	<header>
+        <nav>
+            <a href='listados.php' class='estilo_enlace'><button>Volver</button></a>
+            <a href="../ControlAcceso/cerrar-sesion.php" class='estilo_enlace'><button>Salir</button></a>
+        </nav>
+	</header>
+    <main class="contenedor">	
     <h1>Modificar Usuario</h1>
     <?php
 		// crea las variables para la comprobación de los datos y conectamos con la BBDD para obtener y pintar los datos de la id que acabamos de enviar a la página
@@ -60,9 +67,9 @@ if (!isset($_SESSION["email"])){
     	if (count($_REQUEST) > 0) 
     	{
 			//si entramos por enlace para modificar
-    		if (isset($_GET["usuarioId"])) 
+    		if (isset($_GET["id"])) 
     		{
-            	$usuario = $_GET["usuarioId"];
+            	$usuario = $_GET["id"];
 
             	//Conectamos a la BBDD para obtener datos el usuario para modificar
 
@@ -70,7 +77,7 @@ if (!isset($_SESSION["email"])){
             
         		// Montamos la consulta a ejecutar
 
-				$consulta = "SELECT * FROM usuarios WHERE id = ?";
+				$consulta = "SELECT * FROM usuarios WHERE id_usuario = ?";
         	
 		        // prepararamos la consulta
 
@@ -98,8 +105,10 @@ if (!isset($_SESSION["email"])){
 						
 					$registro = $consulta->fetch();
 					$nombre = $registro["nombre"];
+					$apellidos = $registro["apellidos"];
+					$descripcion = $registro["descripcion"];
 					$email = $registro["email"];
-					$perfil = $registro["perfil_id"];
+					$tfno = $registro["tfno"];
 					$activo = $registro["activo"];
 
 					$consulta = null;
@@ -114,8 +123,10 @@ if (!isset($_SESSION["email"])){
 			    
 				$usuario = obtenerValorCampo("id");		   
 				$nombre = obtenerValorCampo("nombre");  
+				$apellidos = obtenerValorCampo("apellidos");
 				$email = obtenerValorCampo("email");
-				$perfil = obtenerValorCampo("perfil");
+				$descripcion = obtenerValorCampo("descripcion");
+				$tfno = obtenerValorCampo("tfno");
 				$activo = obtenerValorCampo("activo");
 			 
 
@@ -127,7 +138,7 @@ if (!isset($_SESSION["email"])){
 
 				$conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-				$consulta = "SELECT * FROM usuarios WHERE id = ?";
+				$consulta = "SELECT * FROM usuarios WHERE id_usuario = ?";
         	
 		        // prepararamos la consulta
 
@@ -149,40 +160,30 @@ if (!isset($_SESSION["email"])){
 					$conexion = null;
 					header("Location: listados.php");
 				}
-		        
-	        	// Nombre del usuario debe rellenarse
+				
+				
+		       // Nombre y apellidos del usuario  debe rellenarse
 				if ($nombre == "")
 				{
 					$errores["nombre"] = "Campo nombre no puede quedar vacío";
 					$nombre = ""; 
-				}	
-		        else 
-		        {
-		        	// Comprobar que no exita un usuario con ese nombre.
-					//Para ello, te conectas a la bbdd, ejecutas un SELECT y comprueba si hay ya ese nombre.
-					$conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
-					$consulta = "SELECT * FROM usuarios WHERE nombre = '$nombre' AND id != '$usuario'";
-
-					$consulta = $conexion->query($consulta);
-		        	
-					// comprobamos si, al ejecutar la consulta, tenemos más de 0 registro. En tal caso, generar el mensaje de error.
-					if ($consulta->rowCount() > 0)
-					{
-						//Msj Error
-						$errores["nombre"] = "El nombre del usuario ya existe";
-						$nombre = "";
-					}
-
-					$consulta = null;
-					$conexion = null;					
-		        }
-
-
-					// Nombre de perfil a partir de la función "validarEnteroPositivo", ya que usaremos el id
-				if (!validarEnteroPositivo($perfil))
+				}
+				
+				if ($apellidos == "")
 				{
-					$errores["perfil"] = "Campo perfil no cumple los requisitos establecidos";
-					$perfil = ""; 
+					$errores["apellidos"] = "Campo apellidos no puede quedar vacío";
+					$apellidos = ""; 
+				}
+
+				if ($tfno != null && validarEnteroLimites($tfno, 600000000, 799999999))
+				{
+					$errores["tfno"] = "Campo teléfono no es correcto.";
+					$tfno = null;
+				}
+
+				// Si el teléfono está vacío, lo establecemos como null
+				if (trim($tfno) === "") {
+					$tfno = null;
 				}
 				
 				// Email debe tener formato correcto de email
@@ -195,7 +196,7 @@ if (!isset($_SESSION["email"])){
 					// Comprobar que no exita un email igual.
 					//Para ello, te conectas a la bbdd, ejecutas un SELECT .
 					$conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
-					$consulta = "SELECT * FROM usuarios WHERE email = '$email' AND id != '$usuario'";
+					$consulta = "SELECT * FROM usuarios WHERE email = '$email' AND id_usuario != '$usuario'";
 
 					$consulta = $conexion->query($consulta);
 		        	
@@ -234,10 +235,24 @@ if (!isset($_SESSION["email"])){
   	?>
   		<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
 	    	<input type="hidden" name="id" value="<?php echo $usuario ?>">
+			<p>
+	            <!-- Campo email -->
+				<label for="email">Email: </label>
+	            <input type="email" name="email" placeholder="email" value="<?php echo $email ?>" required>
+	            <?php
+					if (isset($errores["email"])):
+						{	
+	            ?>
+	            	<p class="error"><?php echo $errores["email"] ?></p>
+	            <?php
+						}
+	            	endif;
+	            ?>
+	        </p>
 	    	<p>
 	            <!-- Campo nombre -->
-				<label for="nombre">Nombre</label>
-	            <input type="text" name="nombre" placeholder="Nombre" value="<?php echo $nombre ?>">
+				<label for="nombre">Nombre: </label>
+	            <input type="text" name="nombre" placeholder="Nombre" value="<?php echo $nombre ?>" required>
 	            <?php
 					if (isset($errores["nombre"])):
 						{	
@@ -249,59 +264,41 @@ if (!isset($_SESSION["email"])){
 	            ?>
 	        </p>
 			<p>
-	            <!-- Campo email nuevo -->
-				 <label for="email">Email</label>
-	            <input type="email" name="email" placeholder="email" value="<?php echo $email ?>">
+	            <!-- Campo Apellidos -->
+				<label for="apellidos">Apellidos: </label>
+	            <input type="text" name="apellidos" placeholder="Apellidos" value="<?php echo $apellidos ?>" required>
 	            <?php
-	            	if (isset($errores["email"])):
+					if (isset($errores["apellidos"])):
+						{	
 	            ?>
-	            	<p class="error"><?php echo $errores["email"] ?></p>
+	            	<p class="error"><?php echo $errores["apellidos"] ?></p>
+	            <?php
+						}
+	            	endif;
+	            ?>
+	        </p>
+			<p>
+	            <!-- Campo tfno -->
+				<label for="tfno">Teléfono: </label>
+	            <input type="number" name="tfno" placeholder="6xxxxxxxx" value="<?php echo $tfno ?>" min="600000000" max="799999999">
+	            <?php
+	            	if (isset($errores["tfno"])):
+	            ?>
+	            	<p class="error"><?php echo $errores["tfno"] ?></p>
 	            <?php
 	            	endif;
 	            ?>
 	        </p>
 			<p>
-	            <!-- Campo perfil -->
-				 <label for="perfil">Perfil</label>
-	            <select id="perfil" name="perfil">
-	            	<option value="">Seleccione Perfil</option>
-	            <?php
-					//Conectar a la base de datos para tomar los posibles valores de perfiles.
-					
-	            	$conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
-					//Usamos un SELECT para traer los valores del id y el nombre de los perfiles.
-	            	$consulta = "SELECT id, perfil FROM perfiles";
-	            	
-	            	$resultado = resultadoConsulta($conexion, $consulta);
-
-  					while ($row = $resultado->fetch(PDO::FETCH_ASSOC)):
-//Usamos el $row para darle los valores al desplegable de los perfiles, siendo el id el valor que toma la variable $rol (o como lo hayáis llamado) y el nombre lo que aparece en el desplegable.
-						if ($row["id"] == 3 || $row["id"] == 4) {			
-						
-				?>
-  					<option value="<?php echo $row['id']; ?>" <?php echo $row["id"] == $perfil ? "selected" : "" ?>><?php echo $row["perfil"]; ?></option>
-  				<?php
-						}
-  					endwhile;
-  					
-  					$resultado = null;
-        			$conexion = null;
-  				?>
-  				</select>
-  				
-	            <?php
-	            	if (isset($errores["perfil"])):
-	            ?>
-	            	<p class="error"><?php echo $errores["perfil"] ?></p>
-	            <?php
-	            	endif;
-	            ?>
-	        </p>
-
+	            <!-- Descripción -->
+				<label for="descripcion">Descripción: </label>
+	            <textarea name="descripcion" rows="5" cols="33" placeholder="Añade descripción de ti mismo ..." maxlength="600" value="<?php echo $descripcion ?>">
+				<?php echo $descripcion ?></textarea>
+	        </p>			
 			<p>
 	            <!-- Campo Activo -->
 				 <label for="activo">Activo</label>
-	            <select id="activo" name="activo">
+	            <select id="activo" name="activo" required>
 	            	<option value="">Seleccione Activo</option>
 					<option value="0" <?php echo 0 == $activo ? "selected" : "" ?>>0</option>
 					<option value="1" <?php echo 1 == $activo ? "selected" : "" ?>>1</option>
@@ -316,7 +313,7 @@ if (!isset($_SESSION["email"])){
 	        </p>
 	        <p>
 	            <!-- Botón submit -->
-	            <input type="submit" value="Guadar">
+	            <input type="submit" value="Modificar">
 	        </p>
 	    </form>
   	<?php
@@ -329,19 +326,18 @@ if (!isset($_SESSION["email"])){
 			
 			// Creamos una variable con la consulta "UPDATE" a ejecutar
 
-			$consulta = "UPDATE usuarios SET nombre= :nombre, email= :email, perfil_id= :perfil, 
-							 activo= :activo, updated_at= :fecha_modif
-  							WHERE id = :id";
+			$consulta = "UPDATE usuarios SET nombre= :nombre, apellidos= :apellidos, email= :email, tfno= :tfno, activo= :activo
+  							WHERE id_usuario = :id";
 			
 			// preparamos la consulta (bindParam)
 
 			$resultado = $conexion->prepare($consulta);
 			
 			$resultado->bindParam(":nombre", $nombre);
+			$resultado->bindParam(":apellidos", $apellidos);
 			$resultado->bindParam(":email", $email);
-			$resultado->bindParam(":perfil", $perfil);
-			$resultado->bindParam(":activo", $activo);
-			$resultado->bindParam(":fecha_modif", $fechaActual);
+			$resultado->bindParam(":tfno", $tfno);;
+			$resultado->bindParam(":activo", $activo);;
 			$resultado->bindParam(":id", $usuario);
 
 			// ejecutamos la consulta 
@@ -363,15 +359,7 @@ if (!isset($_SESSION["email"])){
   			
     	endif;
     ?>
-    <div class="contenedor">
-        <div class="enlaces">
-            <a href="listados.php">Volver al listado</a>			
-			<p>
-				<a href="../ControlAcceso/cerrar-sesion.php">Cerrar sesión</a>
-			</p>
-        </div>
-   	</div>
-    
+	</main>
 </body>
 </html>
 

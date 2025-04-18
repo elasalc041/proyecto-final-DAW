@@ -59,23 +59,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ((int) $registro["activo"] !== 1) {
                 print'<p style="color: red">Tu cuenta aún no está activa. ¿Has comprobado tu bandeja de correo?</p>';
                 header("refresh:3;url=../index.php");
-            }            
-                                              
+            }else{
                 // Comprobamos si los datos son correctos
-            if (password_verify($passwdLogin, $hash)) {
-                // Si son correctos, creamos la sesión
-                session_name("sesion-privada");
-                session_start();
-                $_SESSION['email'] = $email;
-                // Redireccionamos a la página privada
-                header('Location: ../index.php');
-                exit();
+                if (password_verify($passwdLogin, $hash)) {
+                    // Si son correctos, creamos la sesión
+                    session_name("sesion-privada");
+                    session_start();
+                    $_SESSION['email'] = $email;
+                    // Redireccionamos a la página privada
+                    header('Location: ../index.php');
+                    exit();
+                    }
+                    else {
+                    // Si no son correctos, informamos al usuario
+                    print'<p style="color: red">El email o la contraseña es incorrecta.</p>';
+                    header("refresh:3;url=../index.php");
+                    exit();
                 }
-                else {
-                // Si no son correctos, informamos al usuario
-                print'<p style="color: red">El email o la contraseña es incorrecta.</p>';
-                header("refresh:3;url=../index.php");
-                exit();
             }
             
         }

@@ -373,10 +373,10 @@ if (!isset($_SESSION["email"])){
 	            <!-- Campo formato imagen -->
 	            <select id="formato" name="formato_foto" required >
 	            	<option value="">Seleccione Categoria</option>
-					<option value="png">PNG</option>
-					<option value="jpeg">JPEG</option>
-					<option value="svg">SVG</option>
-					<option value="gif">GIF</option>
+					<option value="png" <?php echo "png" == $formato_foto ? "selected" : "" ?>>PNG</option>
+					<option value="jpeg" <?php echo "jpeg" == $formato_foto ? "selected" : "" ?>>JPEG</option>
+					<option value="svg" <?php echo "svg" == $formato_foto ? "selected" : "" ?>>SVG</option>
+					<option value="gif" <?php echo "gif" == $formato_foto ? "selected" : "" ?>>GIF</option>
   				</select>
   				
 	            <?php
