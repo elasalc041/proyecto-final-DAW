@@ -13,7 +13,7 @@ if (!isset($_SESSION["email"])){
 	//obtener el id del usuario
     $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-    $consulta = "select * FROM usuarios WHERE email = :email;";
+    $consulta = "SELECT * FROM usuarios WHERE email = :email;";
 
     $consulta = $conexion->prepare($consulta);
 

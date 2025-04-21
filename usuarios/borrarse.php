@@ -27,7 +27,7 @@ if (!isset($_SESSION["email"])){
     $resultado = $consulta->fetch();
 
     // Guardo el id del usuario
-    $id = (int) $resultado["id"];
+    $id = (int) $resultado["id_usuario"];
 
     $resultado = null;
     $conexion = null;
@@ -38,35 +38,50 @@ if (!isset($_SESSION["email"])){
     {
 
         //si ha venido a través del enlace con la id de la oferta 
-        if (isset($_GET["ofertaId"]))
+        if (isset($_GET["id"]))
         {
             $exito = false;
 
-            $idOferta = $_GET["ofertaId"];
+            $rally = $_GET["id"];
 
             $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-            $consulta = "DELETE FROM solicitudes WHERE oferta_id = :oferta AND usuario_id =  :usuario";
+            $consulta = "DELETE FROM inscripciones WHERE rally_id = :rally AND usuario_id =  :usuario"; //borra la inscripcion
 
             $resultado = $conexion->prepare($consulta);
 
-            $resultado->bindParam(":oferta", $idOferta);
+            $resultado->bindParam(":rally", $rally);
 
             $resultado->bindParam(":usuario", $id);
 
+
+            $consulta2 = "DELETE FROM fotos WHERE rally_id = :rally AND usuario_id =  :usuario"; //borra las fotos subidas
+
+            $resultado2 = $conexion->prepare($consulta2);
+    
+            $resultado2->bindParam(":rally", $rally);
+    
+            $resultado2->bindParam(":usuario", $id);
+
             try {
                 $resultado->execute();
-                $resultado = null;
-				$conexion = null;
+                $resultado2->execute();     
+
+                borrarDirectorio("../uploads/usuarios/$id/rallies/$rally/");
 
                 $exito = true;
+
+                $resultado = null;
+                $resultado2 = null;
+				$conexion = null;
+
             } catch (PDOException $e) {
                 echo $e->getMessage();
             }
             
             //En ambos casos, redireccionar al listado original.
 
-            header("Location: ofertasSolicitadas.php");
+            header("Location: ../rally/rally.php?rally=$rally");
             exit();
         } 
         

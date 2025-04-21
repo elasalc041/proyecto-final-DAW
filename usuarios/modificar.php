@@ -153,12 +153,6 @@ if (!isset($_SESSION["email"])){
 					$rutaFoto = $directorioSubida . $nombreOriginal;
 
 					
-					// Generamos nombre único
-					//$extension = pathinfo($nombreOriginal, PATHINFO_EXTENSION);
-					//$nombreImagen = uniqid() . "." . strtolower($extension);
-					//$rutaFinal = $directorioSubida . $nombreImagen;
-
-
 					// Validar tipo y tamaño
 					$tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif', 'image/svg'];
 					if (!in_array($_FILES['imagen']['type'], $tiposPermitidos)) {

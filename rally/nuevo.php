@@ -227,8 +227,6 @@ if (!isset($_SESSION["email"])){
 					mkdir($directorio);
 				}
 
-				echo $imagenSubida;
-
 				//si imagen ha sido subida, cargamos al sevidor y actualizamos registro
 				if ($imagenSubida) {
 

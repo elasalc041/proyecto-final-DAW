@@ -14,7 +14,7 @@ if (!isset($_SESSION["email"])){
 	//obtener el id del usuario
     $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-    $consulta = "select * FROM gestores WHERE email = :email;";
+    $consulta = "select * FROM usuarios WHERE email = :email;";
 
     $consulta = $conexion->prepare($consulta);
 
@@ -27,7 +27,7 @@ if (!isset($_SESSION["email"])){
     $resultado = $consulta->fetch();
 
     // Guardo el perfil
-    $perfil = (int) $resultado["perfil_id"];
+    $perfil = (int) $resultado["rol_id"];
 
 
 	if ($perfil != 1) {
@@ -45,15 +45,15 @@ if (!isset($_SESSION["email"])){
         if (count($_REQUEST) > 0)
         {
 
-            if (isset($_GET["usuarioId"]))
+            if (isset($_GET["id"]))
             {
                 $exito = false;
 
-                $usuario = $_GET["usuarioId"];
+                $usuario = $_GET["id"];
 
                 $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-                $consulta = "DELETE FROM usuarios WHERE id = :id";
+                $consulta = "DELETE FROM usuarios WHERE id_usuario = :id";
 
                 $resultado = $conexion->prepare($consulta);
 
@@ -65,6 +65,9 @@ if (!isset($_SESSION["email"])){
                     $conexion = null;
 
                     $exito = true;
+
+                    borrarDirectorio("../uploads/usuarios/$usuario");
+
                 } catch (PDOException $e) {
                     exit($e->getMessage());
                 }
@@ -85,7 +88,7 @@ if (!isset($_SESSION["email"])){
                 exit();
             } 
         } 
-            //Evitar que se pueda entrar directamente a la página .../borrar.php, redireccionando
+            //Evitar que se pueda entrar directamente a la página, redireccionando
         else 
         {
             header("Location: ../index.php");

@@ -53,7 +53,7 @@ if (isset($_SESSION["email"])){
 }
 
 
-//Si se ha seleccionado un rally
+//Si se ha entrado por GET o POST
 if (count($_REQUEST) > 0)
 {
 
@@ -151,7 +151,7 @@ if (count($_REQUEST) > 0)
 					<li>Límite de participantes: $registro[participantes]</li>
 					<li>Participantes registrados: $registro[registrados]</li>
 					<li>Límite de fotos por usuario: $registro[lim_fotos]</li>
-					<li>Tamaño de foto máximo: $registro[tam_foto]kb</li>
+					<li>Tamaño de foto máximo: $registro[tam_foto]MB</li>
 					<li>Formato de imagen aceptada: $registro[formato_foto]</li>
 					" . PHP_EOL;
 				?>
@@ -161,7 +161,7 @@ if (count($_REQUEST) > 0)
 		<section class="fotos">
 			<?php
 				//fotos del usuario registrado
-				if ($email != "") {
+				if (in_array($rally, $rallies)) {
 					$select = "SELECT * FROM fotos WHERE rally_id = :rally AND usuario_id = :usuario ORDER BY fecha desc";
 
 					$consulta = $conexion->prepare($select);
@@ -176,7 +176,7 @@ if (count($_REQUEST) > 0)
 					//comprobar número de fotos subidas por usuario y fecha 
 					if ($consulta->rowCount() < $registro["lim_fotos"] && $fechaActual >= $registro["fecha_ini"] && $fechaActual <= $registro["fecha_fin"])
 					{
-						echo "<a href='../usuarios/subirFoto.php?id=$rally' class='estilo_enlace'><button>Subir nueva foto</button></a>" . PHP_EOL;
+						echo "<button id='abrirModal'>Subir nueva foto</button>" . PHP_EOL;
 					}
 
 					// comprobamos si algún registro 
@@ -191,6 +191,7 @@ if (count($_REQUEST) > 0)
 							echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;							
 							echo "<p>Estado $resultado[estado]</p>" . PHP_EOL;
 							echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
+							//si la foto no ha sido aceptada puede ser eliminada
 							if ($resultado["estado"] !== "aceptada") {
 								echo "<a href='../usuarios/eliminarFoto.php?id=$resultado[id_foto]' class='estilo_enlace'><button>Eliminar</button></a>" . PHP_EOL;
 							}							
@@ -239,6 +240,21 @@ if (count($_REQUEST) > 0)
 			?>
 
 		</section>
+
+		<!-- El modal (inicialmente oculto) -->
+		<div id="miModal" class="modal">
+			<div class="modal-content">
+				<span id="cierreModal">&times;</span>
+				<h2>Subir Foto</h2>
+				<form action="subirFoto.php" method="POST" enctype="multipart/form-data">
+					<input type="hidden" name="rally" value="<?php echo $rally ?>">
+					<label for="imagen">Selecciona una foto:</label>
+					<input type="file" name="imagen" id="imagen" required>
+					<input type="submit" value="Subir Foto">
+				</form>
+			</div>
+		</div>
+
 	</main>
 	<?php
             // Libera el resultado y cierra la conexión
@@ -249,6 +265,29 @@ if (count($_REQUEST) > 0)
         include '../utiles/footer.php';
     ?>
 </body>
+<script>
+
+	// implementa formulario foto modal
+	const modal = document.getElementById("miModal");
+	const btn = document.getElementById("abrirModal");
+	const cierre = document.getElementById("cierreModal");
+
+	// Cuando el usuario haga clic en el botón, modal se vuelve visible
+	btn.addEventListener("click", ()=>{
+		modal.style.display = "block";
+	});
+
+	// Cuando el usuario haga clic en <span> (x), modal vuelve a ser oculto. También cuando se haga clic fuera del modal
+	cierre.addEventListener("click", ()=>{
+		modal.style.display = "none";
+	});
+
+	window.addEventListener("click", function(event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	});
+</script>
 </html>
 
 <?php

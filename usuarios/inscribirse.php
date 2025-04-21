@@ -27,7 +27,7 @@ if (!isset($_SESSION["email"])){
     $resultado = $consulta->fetch();
 
     // Guardo el id del usuario
-    $id = (int) $resultado["id"];
+    $id = (int) $resultado["id_usuario"];
 
     $resultado = null;
     $conexion = null;
@@ -38,70 +38,66 @@ if (!isset($_SESSION["email"])){
     {
 
          //si ha venido a través del enlace con la id de la oferta 
-        if (isset($_GET["ofertaId"]))
+        if (isset($_GET["id"]))
         {
             $exito = false;
 
-            $idOferta = $_GET["ofertaId"];
+            $rally = $_GET["id"];
 
             $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
             //si se ha alcanzado aforo máximo no puede inscribirse
-            //guardo numero Solicitudes
-            $consulta1 = "SELECT * FROM solicitudes WHERE oferta_id= :oferta";
+            //guardo numero Inscripciones
+            $consulta1 = "SELECT * FROM inscripciones WHERE rally_id= :rally";
 
             $consulta1 = $conexion->prepare($consulta1);
             
             $consulta1->execute([
-                "oferta" => $idOferta
+                "rally" => $rally
             ]);
             
-            $numSolicitudes = $consulta1->rowCount();
+            $numInscritos = $consulta1->rowCount();
            
 
             // Guardo el aforo
-            $consulta2 = "SELECT * FROM ofertas WHERE id= :oferta";
+            $consulta2 = "SELECT * FROM rally WHERE id_rally= :rally";
 
             $consulta2 = $conexion->prepare($consulta2);
             
             $consulta2->execute([
-                "oferta" => $idOferta
+                "rally" => $rally
             ]);
 
             $resultado = $consulta2->fetch();
             
-            $aforo = (int) $resultado["aforo"];
+            $participantes = (int) $resultado["participantes"];
 
 
             $consulta1 = null;
             $consulta2 = null;
 
 
-            if ($numSolicitudes >= $aforo)
+            if ($numInscritos >= $participantes)
 			{
 					//desconectamos y volvemos al listado original
 					
 					$conexion = null;
                     echo "Aforo completo";  
-					header("refresh:3;url=../index.php");
+					header("refresh:3;url=../rally/rally.php?rally=$rally");
 			}else{                
 
 
-                $insert = $conexion->prepare("INSERT INTO solicitudes (oferta_id, usuario_id, fecha_solicitud, created_at, updated_at) 
-                values (:oferta, :usuario, :fechaSolicitud, :fechaCreada, :fechaModif)");
+                $insert = $conexion->prepare("INSERT INTO inscripciones (rally_id, usuario_id, fecha) 
+                values (:rally, :usuario, :fechaSolicitud)");
 
                 // preparar la consulta (usar bindParam)
                 
 
-                $insert->bindParam(":oferta", $idOferta);
+                $insert->bindParam(":rally", $rally);
 
                 $insert->bindParam(":usuario", $id);
 
                 $insert->bindParam(":fechaSolicitud", $fechaActual);
-
-                $insert->bindParam(":fechaCreada", $fechaActual);
-
-                $insert->bindParam(":fechaModif", $fechaActual);
 
 
                 // ejecutar la consulta 
@@ -111,6 +107,15 @@ if (!isset($_SESSION["email"])){
                     $conexion = null;
 
                     $exito = true;
+
+
+                    //creación de directorio para imágenes subidas al rally
+				    $directorio = "../uploads/usuarios/$id/rallies/$rally/";
+
+                    if (!is_dir($directorio)) {
+                        mkdir($directorio);
+                    }
+
                 } catch (PDOException $e) {
                     echo $e->getMessage();
                 }
@@ -118,17 +123,17 @@ if (!isset($_SESSION["email"])){
                 //Si todo ha ido bien, mostrar mensaje
                 if ($exito) 
                 { 
-                    echo "Registro en la actividad con éxito";            
+                    echo "Inscripción realizada con éxito";            
                 } 
                 //Si no ha ido bien, mostrar mensaje 
                 else 
                 {
-                    echo "No se ha podido registrar en la actividad";  
+                    echo "No se ha podido inscribir";  
                 }
                 
                 //En ambos casos, redireccionar al listado original tras 3 segundos.
 
-                header("refresh:3;url=../index.php");
+                header("refresh:1;url=../rally/rally.php?rally=$rally");
                 exit();
             }
         } 
