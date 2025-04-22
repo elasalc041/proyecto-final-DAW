@@ -119,8 +119,7 @@ if (!isset($_SESSION["email"])) {
 
         //si ha habido algún error
         if (count($errores) > 0) {
-            echo "La imagen no pudo ser cargada. $errores[imagen]";
-            header("refresh:3;url=rally.php?rally=$rally");
+            header("Location: rally.php?rally=$rally&error=$errores[imagen]");
         }else{
 
             $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);

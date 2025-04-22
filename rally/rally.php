@@ -176,7 +176,12 @@ if (count($_REQUEST) > 0)
 					//comprobar número de fotos subidas por usuario y fecha 
 					if ($consulta->rowCount() < $registro["lim_fotos"] && $fechaActual >= $registro["fecha_ini"] && $fechaActual <= $registro["fecha_fin"])
 					{
+						echo "<div>" . PHP_EOL;
 						echo "<button id='abrirModal'>Subir nueva foto</button>" . PHP_EOL;
+						if (isset($_GET["error"])){
+							echo "<span  class='error'>$_GET[error]</span>". PHP_EOL;
+						}
+						echo "</div>" . PHP_EOL;
 					}
 
 					// comprobamos si algún registro 
@@ -193,7 +198,7 @@ if (count($_REQUEST) > 0)
 							echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
 							//si la foto no ha sido aceptada puede ser eliminada
 							if ($resultado["estado"] !== "aceptada") {
-								echo "<a href='../usuarios/eliminarFoto.php?id=$resultado[id_foto]' class='estilo_enlace'><button>Eliminar</button></a>" . PHP_EOL;
+								echo "<a href='borrarFoto.php?id=$resultado[id_foto]&rally=$rally' class='estilo_enlace'><button>Eliminar</button></a>" . PHP_EOL;
 							}							
 							echo "</article>". PHP_EOL;
 							

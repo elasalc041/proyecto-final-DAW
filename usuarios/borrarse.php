@@ -37,7 +37,7 @@ if (!isset($_SESSION["email"])){
     if (count($_REQUEST) > 0)
     {
 
-        //si ha venido a través del enlace con la id de la oferta 
+        //si ha venido a través del enlace con el id del rally
         if (isset($_GET["id"]))
         {
             $exito = false;

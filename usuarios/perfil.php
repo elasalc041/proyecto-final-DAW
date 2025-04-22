@@ -147,7 +147,7 @@ if (!isset($_SESSION["email"])) {
                                 }else{
                                     echo "Ranking: 0</p>" . PHP_EOL;
                                 }
-                                echo "<button><a href='../index.php' class='estilo_enlace'>Ir</a></button>". PHP_EOL;
+                                echo "<a href='../rally/rally.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Ir</button></a>". PHP_EOL;
                                 echo "</div> " . PHP_EOL;
 
                              //concursos ya pasados y estuviera apuntado   
