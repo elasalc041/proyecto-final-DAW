@@ -57,7 +57,8 @@ if (!isset($_SESSION["email"])){
 			//fotos pendientes de validación
             $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
 
-			$select = "SELECT * FROM fotos WHERE estado = 'pendiente' ORDER BY fecha asc";
+			$select = "SELECT * FROM fotos f, usuarios u 
+            WHERE f.usuario_id=u.id_usuario AND estado = 'pendiente' ORDER BY f.fecha asc";
 
 			$consulta = $conexion->query($select);
 
@@ -71,7 +72,7 @@ if (!isset($_SESSION["email"])){
 				while ($resultado = $consulta->fetch(PDO::FETCH_ASSOC)) {
 					echo "<article class='foto'>" . PHP_EOL;
 					echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;
-					echo "<p>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
+					echo "<p>Usuario $resultado[id_usuario]: $resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
                     echo "<p>Rally $resultado[rally_id]</p>" . PHP_EOL;
 					echo "<a href='revisar.php?id=$resultado[id_foto]&validar=1' class='estilo_enlace'><button>Validar</button></a>" . PHP_EOL;
                     echo "<a href='revisar.php?id=$resultado[id_foto]&validar=0' class='estilo_enlace'><button>Rechazar</button></a>" . PHP_EOL;

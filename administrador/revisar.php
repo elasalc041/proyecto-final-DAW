@@ -55,13 +55,13 @@ if (!isset($_SESSION["email"])) {
 
                 // rechazada si validar = 0
 
-                $consulta = "UPDATE fotos SET estado= 'rechazada' WHERE id = :id";
+                $consulta = "UPDATE fotos SET estado= 'rechazada' WHERE id_foto = :id";
 
             } else {
 
                 // aceptada si validar = 1
 
-                $consulta = "UPDATE fotos SET estado= 'aceptada' WHERE id = :id";
+                $consulta = "UPDATE fotos SET estado= 'aceptada' WHERE id_foto = :id";
 
             }
 

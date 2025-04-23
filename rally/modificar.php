@@ -286,7 +286,7 @@ if (!isset($_SESSION["email"])){
 				
 				<header>
 					<nav>
-						<a href='listados.php' class='estilo_enlace'><button>Volver</button></a>
+						<a href='../administrador/listados.php' class='estilo_enlace'><button>Volver</button></a>
 						<a href="../ControlAcceso/cerrar-sesion.php" class='estilo_enlace'><button>Salir</button></a>
 					</nav>
 				</header>

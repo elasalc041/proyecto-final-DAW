@@ -235,7 +235,13 @@ if (count($_REQUEST) > 0)
 						echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;
 						echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
 						echo "<p>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
-						echo "<a href='votar.php?id=$resultado[id_foto]' class='estilo_enlace'><button>Votar</button></a>" . PHP_EOL;
+						echo "
+						<form class='formVotar' action='votar.php' method='POST'>
+							<input type='hidden' name='id_foto' value='$resultado[id_foto]'>
+							<input type='hidden' name='rally_id' value='$resultado[rally_id]'>
+							<button class='btnVotar' type='submit'>Votar</button>
+						</form>
+						" . PHP_EOL;
 						echo "</article>". PHP_EOL;
 					}
 				} 
@@ -278,9 +284,12 @@ if (count($_REQUEST) > 0)
 	const cierre = document.getElementById("cierreModal");
 
 	// Cuando el usuario haga clic en el botón, modal se vuelve visible
-	btn.addEventListener("click", ()=>{
-		modal.style.display = "block";
-	});
+	if (btn != null) {
+		btn.addEventListener("click", ()=>{
+			modal.style.display = "block";
+		});
+	}
+	
 
 	// Cuando el usuario haga clic en <span> (x), modal vuelve a ser oculto. También cuando se haga clic fuera del modal
 	cierre.addEventListener("click", ()=>{
@@ -292,6 +301,40 @@ if (count($_REQUEST) > 0)
 			modal.style.display = "none";
 		}
 	});
+
+
+	//implementa votacion controlada en localstorage
+	document.querySelectorAll(".formVotar").forEach(formulario => {
+		formulario.addEventListener("submit", function (event) {
+			event.preventDefault();
+			const idFoto = this.id_foto.value;
+			const rallyId = this.rally_id.value;
+			const rally = `rally_${rallyId}`;
+
+			let votos = JSON.parse(localStorage.getItem(rally)) || [];
+
+			//valida no repetir foto
+			if (votos.includes(idFoto)) {
+				alert("Ya votaste esta foto.");
+				return;
+			}
+
+			//valida maximo 3 fotos
+			if (votos.length >= 3) {
+				alert("Solo puedes votar 3 fotos por rally.");
+				return;
+			}
+
+			//una alerta pararía el proceso
+			votos.push(idFoto);
+			localStorage.setItem(rally, JSON.stringify(votos));
+
+			// Ahora sí, enviar el formulario manualmente
+			this.submit();		
+		});
+	});
+
+
 </script>
 </html>
 

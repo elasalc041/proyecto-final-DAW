@@ -125,8 +125,18 @@ if (!isset($_SESSION["email"])) {
                             if ($registro["fecha_fin"] >= $fechaActual && $apuntado) {
 
                                 //obtener posición de la foto con más puntos del usuario para cada rally
-                                $consulta2 = "SELECT usuario_id FROM fotos WHERE rally_id = $registro[id_rally]
-                                ORDER BY puntos DESC ";
+                                $consulta2 = 
+                                "SELECT * FROM fotos f
+                                WHERE puntos = (
+                                    SELECT MAX(puntos) FROM fotos
+                                    WHERE usuario_id = f.usuario_id AND rally_id = $registro[id_rally]
+                                )
+                                AND id_foto = (
+                                    SELECT MIN(id_foto) FROM fotos
+                                    WHERE usuario_id = f.usuario_id AND puntos = f.puntos AND rally_id = $registro[id_rally]
+                                )
+                                ORDER BY puntos DESC;";
+
 
                                 $resultado2 = $conexion->query($consulta2);
 
@@ -136,6 +146,7 @@ if (!isset($_SESSION["email"])) {
                                     $ranking++;
                                     if ($registro2["usuario_id"] == $id) {
                                        $flag = true;
+                                       $votos = $registro2["puntos"];
                                     }
                                 }
 
@@ -143,9 +154,9 @@ if (!isset($_SESSION["email"])) {
                                 echo "<h3>Rally $registro[id_rally] - $registro[titulo]</h3>" . PHP_EOL;
                                 echo "<p> " . formatoFecha($registro["fecha_ini"]) . " | " . formatoFecha($registro["fecha_fin"]) . PHP_EOL;
                                 if ($flag) {
-                                    echo "Ranking: $ranking</p>" . PHP_EOL;
+                                    echo "Ranking foto mayor puntuación: $ranking. Votos: $votos</p>" . PHP_EOL;
                                 }else{
-                                    echo "Ranking: 0</p>" . PHP_EOL;
+                                    echo "Ninguna foto subida</p>" . PHP_EOL;
                                 }
                                 echo "<a href='../rally/rally.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Ir</button></a>". PHP_EOL;
                                 echo "</div> " . PHP_EOL;
