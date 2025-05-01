@@ -198,7 +198,7 @@ if (count($_REQUEST) > 0)
 							echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
 							//si la foto no ha sido aceptada puede ser eliminada
 							if ($resultado["estado"] !== "aceptada") {
-								echo "<a href='borrarFoto.php?id=$resultado[id_foto]&rally=$rally' class='estilo_enlace'><button>Eliminar</button></a>" . PHP_EOL;
+								echo "<a onclick='confirmarBorrado(\"borrarFoto.php?id=$resultado[id_foto]&rally=$rally\")' class='estilo_enlace'><button>Eliminar</button></a>" . PHP_EOL;
 							}							
 							echo "</article>". PHP_EOL;
 							
@@ -277,6 +277,15 @@ if (count($_REQUEST) > 0)
     ?>
 </body>
 <script>
+	//confirmar
+	function confirmarBorrado(url) {
+		if (confirm("¿Estás seguro de que deseas eliminar esta foto?")) {
+			// Si el usuario hace clic en "Aceptar", redirige a la URL de eliminación
+			window.location.href = url;
+		}
+	}
+
+
 
 	// implementa formulario foto modal
 	const modal = document.getElementById("miModal");
@@ -291,7 +300,7 @@ if (count($_REQUEST) > 0)
 	}
 	
 
-	// Cuando el usuario haga clic en <span> (x), modal vuelve a ser oculto. También cuando se haga clic fuera del modal
+	// Cuando el usuario haga clic, modal vuelve a ser oculto. También cuando se haga clic fuera del modal
 	cierre.addEventListener("click", ()=>{
 		modal.style.display = "none";
 	});

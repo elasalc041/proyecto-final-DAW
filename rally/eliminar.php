@@ -18,15 +18,12 @@ if (!isset($_SESSION["email"])){
 
     $consulta = $conexion->prepare($consulta);
 
-    // Ejecuta consulta
     $consulta->execute([
         "email" => $email
     ]);
 
-    // Guardo el resultado
     $resultado = $consulta->fetch();
 
-    // Guardo el perfil
     $perfil = (int) $resultado["rol_id"];
 
 
@@ -64,9 +61,8 @@ if (!isset($_SESSION["email"])){
                     $resultado = null;
                     $conexion = null;   
                     
-                    $exito = true;
-
-                    borrarDirectorio("../uploads/rallies/$rally");
+                    $exito = true;                   
+                    
 
                 } catch (PDOException $e) {
                     exit($e->getMessage());
@@ -75,7 +71,17 @@ if (!isset($_SESSION["email"])){
                 //Si todo ha ido bien, mostrar mensaje
                 if ($exito) 
                 {  
-                    echo "Rally borrado con éxito";              
+                    echo "Rally borrado con éxito";
+                    
+                    //borrado del directorio del rally
+                    borrarDirectorio("../uploads/rallies/$rally");
+                    
+                    //borrado de los directorios del rally creados en cada usuario inscrito
+                    $directoriosUsuario = glob("../uploads/usuarios/*/rallies/$rally");
+
+                    foreach ($directoriosUsuario as $directorio) {
+                        borrarDirectorio($directorio);
+                    }
                 } 
                 //Si no ha ido bien, mostrar mensaje 
                 else 

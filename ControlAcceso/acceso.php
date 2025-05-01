@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       
             //controlar que usuario es activo
             if ((int) $registro["activo"] !== 1) {
-                print'<p style="color: red">Tu cuenta aún no está activa. ¿Has comprobado tu bandeja de correo?</p>';
+                print'<p style="color: red">Tu cuenta aún no está activa.</p>';
                 header("refresh:3;url=../index.php");
             }else{
                 // Comprobamos si los datos son correctos

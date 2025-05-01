@@ -65,9 +65,7 @@ if (!isset($_SESSION["email"])){
 
             try {
                 $resultado->execute();
-                $resultado2->execute();     
-
-                borrarDirectorio("../uploads/usuarios/$id/rallies/$rally/");
+                $resultado2->execute();                   
 
                 $exito = true;
 
@@ -78,9 +76,13 @@ if (!isset($_SESSION["email"])){
             } catch (PDOException $e) {
                 echo $e->getMessage();
             }
-            
-            //En ambos casos, redireccionar al listado original.
 
+            if ($exito) {
+                //borrado directorio fotos
+                borrarDirectorio("../uploads/usuarios/$id/rallies/$rally/");
+            }
+            
+            //redireccionar al listado original.
             header("Location: ../rally/rally.php?rally=$rally");
             exit();
         } 

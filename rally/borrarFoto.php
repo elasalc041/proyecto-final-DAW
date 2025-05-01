@@ -78,11 +78,7 @@ if (!isset($_SESSION["email"])){
             $resultado->bindParam(":usuario", $id);
 
             try {
-                $resultado->execute();  
-
-                if (is_file("../$url")) {
-                    unlink("../$url"); // Elimina el archivo y devuelve true si tuvo éxito
-                }   
+                $resultado->execute();                 
                 
                 $exito = true;
 
@@ -92,6 +88,12 @@ if (!isset($_SESSION["email"])){
 
             } catch (PDOException $e) {
                 echo $e->getMessage();
+            }
+
+            if ( $exito) {
+                if (is_file("../$url")) {
+                    unlink("../$url"); // Elimina el archivo 
+                }  
             }
             
             //En ambos casos, redireccionar al listado original.

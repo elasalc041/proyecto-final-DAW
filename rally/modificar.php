@@ -233,7 +233,7 @@ if (!isset($_SESSION["email"])){
 		
 			// Creamos una variable con la consulta "UPDATE" a ejecutar
 
-			$consulta = "UPDATE rally SET titulo= :titulo, descripcion= :descripcion, localidad= :localidad, 
+			$consulta = "UPDATE rally SET titulo= :titulo, descripcion= :descripcion, localidad= :localidad, fecha_ini= :fechaInicial, fecha_fin= :fechaFin,
 						formato_foto= :formato, participantes= :participantes, lim_fotos= :lim_fotos, tam_foto= :tam_foto, img= :foto
 								WHERE id_rally = :rally";
 			
@@ -249,6 +249,8 @@ if (!isset($_SESSION["email"])){
 			$resultado->bindParam(":lim_fotos", $lim_fotos);
 			$resultado->bindParam(":tam_foto", $tam_foto);
 			$resultado->bindParam(":foto", $rutaFoto);
+			$resultado->bindParam(":fechaInicial", $fecha_ini);
+			$resultado->bindParam(":fechaFin", $fecha_fin);
 			$resultado->bindParam(":rally", $rally);
 
 			// ejecutamos la consulta 
@@ -291,7 +293,7 @@ if (!isset($_SESSION["email"])){
 					</nav>
 				</header>
 				<main class="contenedor">	
-				<h1>Modificar Perfil</h1>
+				<h1>Modificar Rally</h1>
 
 					<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
 						<input type="hidden" name="id" value="<?php echo $rally ?>">
@@ -383,7 +385,7 @@ if (!isset($_SESSION["email"])){
 						<p>
 							<!-- Campo formato imagen -->
 							<select id="formato" name="formato_foto" required >
-								<option value="">Seleccione Categoria</option>
+								<option value="">Seleccione Formato Foto</option>
 								<option value="png" <?php echo "png" == $formato_foto ? "selected" : "" ?>>PNG</option>
 								<option value="jpeg" <?php echo "jpeg" == $formato_foto ? "selected" : "" ?>>JPEG</option>
 								<option value="svg" <?php echo "svg" == $formato_foto ? "selected" : "" ?>>SVG</option>

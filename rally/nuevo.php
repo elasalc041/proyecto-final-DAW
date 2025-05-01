@@ -73,34 +73,7 @@ if (!isset($_SESSION["email"])){
 	    	//-----------------------------------------------------
 	        // Validaciones
 	        //-----------------------------------------------------
-			/*
-			  // ID debe ser número entero positivo
-			  if (!validarEnteroPositivo($idOfertante))
-			  {
-				  $errores["id"] = "Campo id debe ser positivo";
-				  $idOfertante = ""; 
-			  }else 
-			  {
-				  // Comprobar existe un ofertante con el id.
-				  //Para ello, te conectas a la bbdd, ejecutas un SELECT y comprueba si id existe y pertenece a un ofertante.
-				  $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
-				  $consulta = "SELECT * FROM usuarios WHERE id = '$idOfertante' AND perfil_id = 3";
-  
-				  $consulta = $conexion->query($consulta);
-				  
-				  // comprobamos si, al ejecutar la consulta, tenemos más de 0 registro. En tal caso, generar el mensaje de error.
-				  if ($consulta->rowCount() == 0)
-				  {
-					  //Msj Error
-					  $errores["id"] = "El id no es correcto";
-					  $idOfertante = "";
-				  }
-  
-				  $consulta = null;
-				  $conexion = null;					
-			  }	
-				*/
-
+	 
 	        // Titulo debe rellenarse
 	        if ($titulo == "")
 	        {
@@ -370,7 +343,7 @@ if (!isset($_SESSION["email"])){
 	        <p>
 	            <!-- Campo formato imagen -->
 	            <select id="formato" name="formato_foto" required >
-	            	<option value="">Seleccione Categoria</option>
+	            	<option value="">Seleccione Formato Foto</option>
 					<option value="png" <?php echo "png" == $formato_foto ? "selected" : "" ?>>PNG</option>
 					<option value="jpeg" <?php echo "jpeg" == $formato_foto ? "selected" : "" ?>>JPEG</option>
 					<option value="svg" <?php echo "svg" == $formato_foto ? "selected" : "" ?>>SVG</option>

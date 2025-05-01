@@ -65,9 +65,7 @@ if (!isset($_SESSION["email"])){
                     $conexion = null;
 
                     $exito = true;
-
-                    borrarDirectorio("../uploads/usuarios/$usuario");
-
+                    
                 } catch (PDOException $e) {
                     exit($e->getMessage());
                 }
@@ -75,7 +73,8 @@ if (!isset($_SESSION["email"])){
                 //Si todo ha ido bien, mostrar mensaje
                 if ($exito) 
                 {  
-                    echo "Usuario borrado con éxito";              
+                    echo "Usuario borrado con éxito";  
+                    borrarDirectorio("../uploads/usuarios/$usuario");            
                 } 
                 //Si no ha ido bien, mostrar mensaje 
                 else 

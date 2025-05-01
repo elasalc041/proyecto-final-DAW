@@ -101,7 +101,7 @@ if (!isset($_SESSION["email"])){
                     echo "<td>Rally $registro[id_rally] $registro[titulo]</td> 
                         <td rowspan='2'>    
                             <a href='../rally/modificar.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Modificar</button></a>
-                            <a href='../rally/eliminar.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Eliminar</button></a>
+                            <a onclick='confirmarBorrado(\"../rally/eliminar.php?rally=$registro[id_rally]\")' class='estilo_enlace'><button>Eliminar</button></a>
                             <a href='../rally/rally.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Ir</button></a> 
                         </td>" . PHP_EOL;
                     echo "</tr>". PHP_EOL;
@@ -137,7 +137,7 @@ if (!isset($_SESSION["email"])){
                     }                         
                     echo   "<td rowspan='2'>    
                             <a href='modificarUsuario.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Modificar</button></a>
-                            <a href='eliminarUsuario.php?id=$registro[id_usuario]' class='estilo_enlace'><button>Eliminar</button></a>
+                            <a onclick='confirmarBorrado(\"eliminarUsuario.php?id=$registro[id_usuario]\")' class='estilo_enlace'><button>Eliminar</button></a>
                         </td>" . PHP_EOL;
                     echo "</tr>". PHP_EOL;
                     echo "<tr>" . PHP_EOL;
@@ -162,6 +162,15 @@ if (!isset($_SESSION["email"])){
     ?>
     
 </body>
+<script>
+    //confirmar
+	function confirmarBorrado(url) {
+		if (confirm("¿Estás seguro de que deseas eliminar?")) {
+			// Si el usuario hace clic en "Aceptar", redirige a la URL de eliminación
+			window.location.href = url;
+		}
+	}
+</script>
 </html>
 
 <?php

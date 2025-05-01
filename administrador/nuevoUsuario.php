@@ -148,6 +148,7 @@ if (!isset($_SESSION["email"])){
 
 			mkdir("../uploads/usuarios/$usuario/");
 			mkdir("../uploads/usuarios/$usuario/perfil");
+			mkdir("../uploads/usuarios/$usuario/rallies");
 
 
 

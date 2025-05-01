@@ -127,7 +127,7 @@
       }
 
       // Verificar que ambas fechas sean futuras
-      if ($f1 <= $hoy || $f2 <= $hoy) {
+      if ($f1 < $hoy->format("Y-m-d") || $f2 < $hoy->format("Y-m-d")) {
           return false;
       }
 
@@ -216,7 +216,6 @@
 
     return rmdir($ruta); // Finalmente, borra el directorio
   }
-
 
 
 /**
