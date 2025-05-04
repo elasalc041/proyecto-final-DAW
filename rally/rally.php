@@ -141,7 +141,7 @@ if (count($_REQUEST) > 0)
 			- $registro[localidad].</p> 
 			<p>$registro[descripcion]</p>" . PHP_EOL;
 			
-			echo "<a href='ranking.php?id=$rally' class='estilo_enlace'><button>Ranking</button></a>". PHP_EOL;
+			echo "<a href='ranking.php?rally=$rally' class='estilo_enlace'><button>Ranking</button></a>". PHP_EOL;
 			?>
 			<div class="requisitos">
 				<h5>Requisitos:</h5>
@@ -215,7 +215,7 @@ if (count($_REQUEST) > 0)
 			//fotos generales del rally
 			$select = "SELECT f.*, u.nombre, u.apellidos FROM fotos f JOIN usuarios u 
 			ON f.usuario_id = u.id_usuario
-			WHERE f.rally_id = :id ORDER BY fecha desc";
+			WHERE f.rally_id = :id ORDER BY f.fecha desc";
 
 			$consulta = $conexion->prepare($select);
 
