@@ -5,7 +5,7 @@ require_once("../utiles/funciones.php");
 // Activa las sesiones
 session_name("sesion-privada");
 session_start();
-// Comprueba si existen los valores guardados del formulario en la sesion, en caso contrario vuelve a la página de inicio
+// Comprueba si existen los valores guardados del formulario en la sesion, en caso contrario vuelve
 if (!isset($_SESSION["emailNuevo"]) || !isset($_SESSION["apellidos"])  || !isset($_SESSION["nombre"])){
     header("Location: ../index.php");
 } else{
@@ -83,34 +83,7 @@ if (!isset($_SESSION["emailNuevo"]) || !isset($_SESSION["apellidos"])  || !isset
     http://localhost/aplicacion_rallies/ControlAcceso/establecerUsuario.php?email=$emailEncode&token=$tokenEncode
     ";
 
-    echo $textoEmail;
-     
     session_destroy();
 
-
-    /*
-
-        Papercut (Recomendado para Windows)
-        Descárgalo de: https://github.com/ChangemakerStudios/Papercut-SMTP
-
-        Ejecuta el .exe
-
-        Cambia tu sendmail.ini a:        
-        smtp_server=localhost
-        smtp_port=25
-
-
-        // Envio del email
-        
-        if (mail($email, 'Activa tu cuenta', $textoEmail, $headers)){
-            echo "CORREO ENVIADO";
-        }else{
-            echo "ERROR ENVÍO CORREO";
-        };
-
-        // Redirección a listado 
-        header("refresh:3;url=../index.php");
-        exit();
-    
-    */
+    header("Location: ../ControlAcceso/establecerUsuario.php?email=$emailEncode&token=$tokenEncode");
 }

@@ -66,7 +66,6 @@ if (count($_REQUEST) > 0)
 	} 	
 	else 
 	{
-
 		$rally = $_GET["rally"];
 
 		$conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
@@ -99,66 +98,87 @@ if (count($_REQUEST) > 0)
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rally</title>
+    <link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="../css/estilos.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">    
 </head>
 <body>	
-	<header>
-        <nav>
-            <a href='../index.php' class='estilo_enlace'><button>Volver</button></a>
-            <a href="../ControlAcceso/cerrar-sesion.php" class='estilo_enlace'><button>Salir</button></a>
-        </nav>
-	</header>
-	<main class="contenido">		
-		<?php
-		echo "<h1>$registro[titulo]</h1>" . PHP_EOL;
-		//comprobar si es usuario registrado
-			if ($email != "") {
-				//comprobar si está inscrito al rally
-				if (in_array($rally, $rallies)) {
-					echo "<a href='../usuarios/borrarse.php?id=$rally' class='estilo_enlace'><button>Borrarse</button></a>" . PHP_EOL;
-				}else{
-					//comprobar límite de inscripciones
-					if ($registro["registrados"] < $registro["participantes"]) {						
-						echo "<a href='../usuarios/inscribirse.php?id=$rally' class='estilo_enlace'><button>Inscribirse</button></a>" . PHP_EOL;
-					}else{
-						echo "<div class='completo'>Completo</div> ". PHP_EOL;
-					}
-				}
-			}
-			echo "<div class='img-rally'> " . PHP_EOL;
-			if ($registro["img"] != null) {				
-				echo "<img src='../$registro[img]' alt='Foto del rally'></img>" . PHP_EOL;
-			}else{
-				echo "<img src='' alt='Foto del rally no disponible'></img>" . PHP_EOL;
-			}
-			echo "</div> " . PHP_EOL;
-		?>
-		<section>
-			<?php			
-		//datos del rally
-			echo "
-			<p>Fecha de inicio: " . formatoFecha($registro["fecha_ini"]) . ". Fecha fin del concurso: " . formatoFecha($registro["fecha_fin"]) . "
-			- $registro[localidad].</p> 
-			<p>$registro[descripcion]</p>" . PHP_EOL;
-			
-			echo "<a href='ranking.php?rally=$rally' class='estilo_enlace'><button>Ranking</button></a>". PHP_EOL;
-			?>
-			<div class="requisitos">
-				<h5>Requisitos:</h5>
-				<ul>
+	<header class="sticky-top bg-white shadow-sm">
+		<nav class="d-flex justify-content-between align-items-center w-100 px-3 py-2">
+			<a href='../index.php'class="btn btn-dark">Inicio</a>
+		<?php if ($email != ""): ?>
+			<div class="text-end">
+				<span class="me-3 fw-bold">Bienvenido/a <?php echo $nombre ?></span>
+				<a href="../ControlAcceso/cerrar-sesion.php"  class="btn btn-danger">Salir</a>
+			</div>
+		<?php endif; ?>
+		</nav>
+	</header>	
+	<main class="container">
+		<section class="mb-4">	
+			<div class='d-flex align-items-center gap-3 mb-3 mt-2'>
+				<h1 class='d-inline-block text-primary-emphasis'><?php echo $registro["titulo"] ?></h1>		
 				<?php
-					echo "
-					<li>Límite de participantes: $registro[participantes]</li>
-					<li>Participantes registrados: $registro[registrados]</li>
-					<li>Límite de fotos por usuario: $registro[lim_fotos]</li>
-					<li>Tamaño de foto máximo: $registro[tam_foto]MB</li>
-					<li>Formato de imagen aceptada: $registro[formato_foto]</li>
-					" . PHP_EOL;
+				//comprobar si es usuario registrado
+					if ($email != "") {
+						//comprobar si está inscrito al rally
+						if (in_array($rally, $rallies)) {
+							echo "<a href='../usuarios/borrarse.php?id=$rally' class='btn btn-warning'>Borrarse</a>" . PHP_EOL;
+						}else{
+							//comprobar límite de inscripciones
+							if ($registro["registrados"] < $registro["participantes"]) {						
+								echo "<a href='../usuarios/inscribirse.php?id=$rally' class='btn btn-primary'>Inscribirse</a>" . PHP_EOL;
+							}else{
+								echo "<div class='text-danger fw-bold'>Completo</div> ". PHP_EOL;
+							}
+						}
+					}
 				?>
-				</ul>
+			</div>
+			<div>
+			<?php if ($registro["img"] != null && $registro["img"] != ""): ?>				
+				<img class=" img-rally border border-dark" src="../<?php echo $registro['img']?>" alt='Foto del rally'></img>
+			<?php else: ?>
+				<img class=' img-rally border border-dark' src='' alt='Foto del rally no disponible'></img>
+			<?php endif; ?>
+			</div>		
+		</section>	
+		<section class="container my-5">
+			<div class="card shadow-sm border-0">
+				<div class="card-body">
+					<div class='d-flex align-items-center gap-3 mb-3 mt-2'> 
+						<h2 class="card-title mb-3 d-inline-block">Detalles del Rally</h2>
+						<a href="ranking.php?rally=<?php echo $rally ?>" class="btn btn-outline-primary">Ver Ranking</a>
+					</div>
+					<div class="row">
+						<div class="col-md-7">
+							<p class="mb-1">
+								<strong>Fecha de inicio</strong> <?php echo formatoFecha($registro["fecha_ini"]) ?>
+							</p>
+							<p class="mb-1">
+								<strong>Fecha de fin</strong> <?php echo formatoFecha($registro["fecha_fin"]) ?>
+							</p>
+							<p class="mb-3">
+								<strong>Localidad</strong> <?php echo $registro["localidad"] ?>
+							</p>
+
+							<p><?php echo $registro["descripcion"] ?></p>
+						</div>
+						<div class="col-md-5 mt-4 mt-md-0">
+						<h5>Requisitos</h5>
+							<ul class="list-unstyled ps-3 mb-4">
+								<li><strong>Límite de participantes</strong> <?php echo $registro["participantes"] ?></li>
+								<li><strong>Participantes registrados</strong> <?php echo $registro["registrados"] ?></li>
+								<li><strong>Límite de fotos por usuario</strong> <?php echo $registro["lim_fotos"] ?></li>
+								<li><strong>Tamaño máximo por foto</strong> <span id="tamMax"><?php echo $registro["tam_foto"] ?></span> MB</li>
+								<li><strong>Formato aceptado</strong> <span id="formato"><?php echo $registro["formato_foto"] ?></span></li>
+							</ul>
+						</div>						
+					</div>
+				</div>
 			</div>
 		</section>
-		<section class="fotos">
+		<section class="container my-4">			
 			<?php
 				//fotos del usuario registrado
 				if (in_array($rally, $rallies)) {
@@ -171,51 +191,57 @@ if (count($_REQUEST) > 0)
 
 					$consulta->execute();
 					
-					echo "<h1>Fotos subidas</h1>" . PHP_EOL;
+					echo "<div class='d-flex align-items-center gap-3 mt-2'>" . PHP_EOL;
+					echo "<h3 class='mb-4 d-inline-block'>Tus Fotos</h3>" . PHP_EOL;
 
 					//comprobar número de fotos subidas por usuario y fecha 
 					if ($consulta->rowCount() < $registro["lim_fotos"] && $fechaActual >= $registro["fecha_ini"] && $fechaActual <= $registro["fecha_fin"])
 					{
-						echo "<div>" . PHP_EOL;
-						echo "<button id='abrirModal'>Subir nueva foto</button>" . PHP_EOL;
-						if (isset($_GET["error"])){
-							echo "<span  class='error'>$_GET[error]</span>". PHP_EOL;
-						}
-						echo "</div>" . PHP_EOL;
+						echo "<button class='btn btn-outline-success' onclick='subirImagen()'>Subir nueva foto</button>" . PHP_EOL;
 					}
+					echo "</div>" . PHP_EOL;
 
-					// comprobamos si algún registro 
+					// comprobamos si hay algún registro 
 					if ($consulta->rowCount() == 0)
 					{
-						echo "<h3>No dispones de ninguna foto aún</h3>" . PHP_EOL;
+						echo "<h5>No dispones de ninguna foto aún</h5>" . PHP_EOL;
 					}
 					else
 					{
+						echo "<div class='row g-4'>" . PHP_EOL;
 						while ($resultado = $consulta->fetch(PDO::FETCH_ASSOC)) {
-							echo "<article class='foto'>" . PHP_EOL;
-							echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;							
-							echo "<p>Estado $resultado[estado]</p>" . PHP_EOL;
-							echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
-							//si la foto no ha sido aceptada puede ser eliminada
-							if ($resultado["estado"] !== "aceptada") {
-								echo "<a onclick='confirmarBorrado(\"borrarFoto.php?id=$resultado[id_foto]&rally=$rally\")' class='estilo_enlace'><button>Eliminar</button></a>" . PHP_EOL;
-							}							
-							echo "</article>". PHP_EOL;
-							
+							echo "<div class='col-lg-4 col-md-6 col-12'>" . PHP_EOL;
+								echo "<div class='card h-100 border'>" . PHP_EOL;
+									echo "<img src='../$resultado[url]' class='card-img-top img-card' alt='Foto $resultado[id_foto]'  onclick='mostrarImagen(\"../$resultado[url]\")'>" . PHP_EOL;
+									echo "<div class='card-body d-flex flex-column'>" . PHP_EOL;
+										echo "<div class='mt-auto d-flex justify-content-between'>" . PHP_EOL;
+											echo "<p class='card-text'><strong>Estado</strong> $resultado[estado]</p>" . PHP_EOL;
+											echo "<p class='card-text'><strong>Votos</strong> $resultado[puntos]</p>" . PHP_EOL;
+										echo "</div>" . PHP_EOL;
+									//si la foto no ha sido aceptada puede ser eliminada
+									if ($resultado["estado"] !== "aceptada") {
+										echo "<a onclick='confirmarBorrado(\"borrarFoto.php?id=$resultado[id_foto]&rally=$rally\")' class='btn btn-danger mx-auto'>Eliminar</a>" . PHP_EOL;
+									}	
+									echo "</div>". PHP_EOL;						
+								echo "</div>". PHP_EOL;
+							echo "</div>" . PHP_EOL;	
 						} 
-							
+						echo "</div>" . PHP_EOL;	
 					}
 
 				}
 			?>
 		</section>
-		<section class="fotos">
+		<section class="container my-5">
 			<?php
-			echo "<h1>Fotos de $registro[titulo]</h1>" . PHP_EOL;
+			echo "<h3 class='mb-4'>Fotos subidas por participantes</h3>" . PHP_EOL;
 			//fotos generales del rally
-			$select = "SELECT f.*, u.nombre, u.apellidos FROM fotos f JOIN usuarios u 
+			$select = "SELECT f.*, u.nombre, u.apellidos, r.fecha_ini, r.fecha_fin 
+			FROM usuarios u JOIN fotos f
 			ON f.usuario_id = u.id_usuario
-			WHERE f.rally_id = :id ORDER BY f.fecha desc";
+			JOIN rally r
+			ON f.rally_id = r.id_rally
+			WHERE f.rally_id = :id AND f.estado = 'aceptada' ORDER BY f.fecha desc";
 
 			$consulta = $conexion->prepare($select);
 
@@ -226,43 +252,80 @@ if (count($_REQUEST) > 0)
 			// comprobamos si algún registro 
 			if ($consulta->rowCount() == 0)
 			{
-				echo "<h3>No hay imágenes disponibles en estos momentos</h3>" . PHP_EOL;
+				echo "<h5>No hay imágenes disponibles en estos momentos</h5>" . PHP_EOL;
 			}else{
+				echo "<div class='row g-4'>" . PHP_EOL;
 				while ($resultado = $consulta->fetch(PDO::FETCH_ASSOC)) {
 					//comprobar estado foto 
 					if ($resultado["estado"] == "aceptada") {
-						echo "<article class='foto'>" . PHP_EOL;
-						echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;
-						echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
-						echo "<p>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
-						echo "
-						<form class='formVotar' action='votar.php' method='POST'>
-							<input type='hidden' name='id_foto' value='$resultado[id_foto]'>
-							<input type='hidden' name='rally_id' value='$resultado[rally_id]'>
-							<button class='btnVotar' type='submit'>Votar</button>
-						</form>
-						" . PHP_EOL;
-						echo "</article>". PHP_EOL;
+						echo "<div class='col-lg-4 col-md-6 col-12'>" . PHP_EOL;						
+							echo "<div class='card h-100 border'>" . PHP_EOL;
+								echo "<img src='../$resultado[url]' class='card-img-top img-card' alt='Foto $resultado[id_foto]' onclick='mostrarImagen(\"../$resultado[url]\")''></img>" . PHP_EOL;								
+								echo "<div class='card-body  d-flex flex-column'>" . PHP_EOL;
+									echo "<div class='mt-auto d-flex justify-content-between'>" . PHP_EOL;
+										echo "<p class='card-text'><strong>Autor</strong> $resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
+										echo "<p class='card-text'><strong>Votos</strong> $resultado[puntos]</p>" . PHP_EOL;
+									echo "</div>" . PHP_EOL;
+
+									if ($fechaActual >= $resultado["fecha_ini"] && $fechaActual <= $resultado["fecha_fin"]) {								
+										echo "
+										<form class='mx-auto' action='votar.php' method='POST'>
+											<input type='hidden' name='id_foto' value='$resultado[id_foto]'>
+											<input type='hidden' name='rally_id' value='$resultado[rally_id]'>
+											<button class='btn btn-success' type='submit'>Votar</button>
+										</form>
+										" . PHP_EOL;
+									}
+								echo "</div>". PHP_EOL;
+							echo "</div>". PHP_EOL;
+						echo "</div>" . PHP_EOL;	
 					}
-				} 
-					
+				}
+				echo "</div>" . PHP_EOL; 					
 			}
 			
 			?>
 
 		</section>
 
-		<!-- El modal (inicialmente oculto) -->
-		<div id="miModal" class="modal">
-			<div class="modal-content">
-				<span id="cierreModal">&times;</span>
-				<h2>Subir Foto</h2>
-				<form action="subirFoto.php" method="POST" enctype="multipart/form-data">
-					<input type="hidden" name="rally" value="<?php echo $rally ?>">
-					<label for="imagen">Selecciona una foto:</label>
-					<input type="file" name="imagen" id="imagen" required>
-					<input type="submit" value="Subir Foto">
-				</form>
+		<!-- El modal de subir imagen -->
+		<div class="modal fade" id="modalSubirImg" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">				
+					<div class="modal-header">
+						<h5 class="modal-title">Subir Foto</h5>
+						<button class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+					</div>					
+					<div class="modal-body">
+						<form id="formulario" action="subirFoto.php" method="POST" enctype="multipart/form-data">
+						<input type="hidden" name="rally" value="<?php echo $rally ?>">
+						<div class="mb-3">
+							<label for="imagen" class="form-label">Selecciona una foto:</label>
+							<input class="form-control" type="file" name="imagen" id="imagen" accept="image/*" required>
+
+							<?php if (isset($_GET["error"])): ?>
+								<p class='text-danger ms-3'><?php echo $_GET["error"] ?></p>
+							<?php endif;  ?>
+
+						</div>
+						<div class="text-end">
+							<button type="submit" class="btn btn-primary">Subir Foto</button>
+						</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Modal para imagen ampliada -->
+		<div class="modal fade" id="modalImagen" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content bg-transparent border-0">
+				<div class="modal-body d-flex justify-content-center align-items-center p-0">
+					<img id="imagenAmpliada" src=""  alt="Imagen ampliada">
+				</div>
+				</div>
 			</div>
 		</div>
 
@@ -274,9 +337,33 @@ if (count($_REQUEST) > 0)
         $conexion = null;
 
         include '../utiles/footer.php';
+
+		if (isset($_GET["error"])) {
+			echo "<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				var modal = new bootstrap.Modal(document.getElementById('modalSubirImg'));
+				modal.show();
+			});
+			</script>" . PHP_EOL;
+		}		
     ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 </body>
 <script>
+	//funcion abre modal imagen
+	function mostrarImagen(src) {
+		const modal = new bootstrap.Modal(document.getElementById('modalImagen'));
+		document.getElementById('imagenAmpliada').src = src;
+		modal.show();
+	}
+
+		//funcion abre modal subirFoto
+	function subirImagen() {
+		const modal = new bootstrap.Modal(document.getElementById('modalSubirImg'));
+		modal.show();
+	}
+
 	//confirmar
 	function confirmarBorrado(url) {
 		if (confirm("¿Estás seguro de que deseas eliminar esta foto?")) {
@@ -284,33 +371,6 @@ if (count($_REQUEST) > 0)
 			window.location.href = url;
 		}
 	}
-
-
-
-	// implementa formulario foto modal
-	const modal = document.getElementById("miModal");
-	const btn = document.getElementById("abrirModal");
-	const cierre = document.getElementById("cierreModal");
-
-	// Cuando el usuario haga clic en el botón, modal se vuelve visible
-	if (btn != null) {
-		btn.addEventListener("click", ()=>{
-			modal.style.display = "block";
-		});
-	}
-	
-
-	// Cuando el usuario haga clic, modal vuelve a ser oculto. También cuando se haga clic fuera del modal
-	cierre.addEventListener("click", ()=>{
-		modal.style.display = "none";
-	});
-
-	window.addEventListener("click", function(event) {
-		if (event.target == modal) {
-			modal.style.display = "none";
-		}
-	});
-
 
 	//implementa votacion controlada en localstorage
 	document.querySelectorAll(".formVotar").forEach(formulario => {
@@ -334,13 +394,35 @@ if (count($_REQUEST) > 0)
 				return;
 			}
 
-			//una alerta pararía el proceso
 			votos.push(idFoto);
 			localStorage.setItem(rally, JSON.stringify(votos));
 
-			// Ahora sí, enviar el formulario manualmente
+			// enviar el formulario 
 			this.submit();		
 		});
+	});
+
+
+	//control de imagen en cliente
+	document.getElementById("formulario").addEventListener("submit", (event) => {
+		const input = document.getElementById("imagen");
+		const file = input.files[0];
+		
+		const tamMaxHtml = document.getElementById("tamMax");
+		const formatoHtml = document.getElementById("formato");
+
+		if (file) {
+
+			if (!file.type.includes(formatoHtml.textContent)) {
+				alert(`Por favor, selecciona un archivo de imagen aceptado (${formatoHtml.textContent}).`);
+				event.preventDefault();
+			}
+
+			if (file.size > tamMaxHtml.textContent * 1024 * 1024) {
+				alert("El archivo es demasiado grande. Debe pesar menos de " + tamMaxHtml.textContent + " MB.");
+				event.preventDefault();
+			}
+		}
 	});
 
 

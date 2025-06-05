@@ -116,44 +116,66 @@ if ($_SERVER["REQUEST_METHOD"]=="GET")
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Establecer contraseña</title>
+         <link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
         <link rel="stylesheet" type="text/css" href="../css/estilos.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">    
     </head>
     <body>
-        <h1>Establecer contraseña</h1>
-    
-                <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-                <p>
-                    <!-- Campo oculto email -->
-                    <input type="hidden" name="email" value="<?php echo $email ?>">
-                    <!-- Campo password -->
-                     <label for="contrasena1">Contraseña: </label>
-                    <input type="password" name="contrasena1" placeholder="*****">
-                    <?php
-                        if (isset($errores["contrasena"])):
-                    ?>
-                        <p class="error"><?php echo $errores["contrasena"] ?></p>
-                    <?php
-                        endif;
-                    ?>
-                </p>   
-                <p>
-                    <!-- Campo password -->
-                    <label for="contrasena2">Repite la contraseña: </label>
-                    <input type="password" name="contrasena2" placeholder="*****">
-                    <?php
-                        if (isset($errores["contrasena"])):
-                    ?>
-                        <p class="error"><?php echo $errores["contrasena"] ?></p>
-                    <?php
-                        endif;
-                    ?>
-                </p>      
-    
-                <p>
-                    <!-- Botón submit -->
-                    <input type="submit" value="Establecer">
-                </p>
-            </form>
+       <main class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-dark text-white text-center">
+                            <h4 class="mb-0">Establecer Contraseña</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="formulario" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+                                <!-- Campo oculto email -->
+                                <input type="hidden" name="email" value="<?php echo $email ?>">
+
+                                <!-- Contraseña -->
+                                <div class="mb-3">
+                                    <label for="contrasena1" class="form-label fw-bold">Contraseña</label>
+                                    <input type="password" id="contrasena1" name="contrasena1" class="form-control" placeholder="*****" minlength="4" maxlength="20" required>
+                                    <?php if (isset($errores["contrasena"])): ?>
+                                        <p class="text-danger small"><?php echo $errores["contrasena"] ?></p>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Repetir contraseña -->
+                                <div class="mb-3">
+                                    <label for="contrasena2" class="form-label fw-bold">Repite la contraseña</label>
+                                    <input type="password" id="contrasena2" name="contrasena2" class="form-control" placeholder="*****" minlength="4" maxlength="20" required>
+                                    <?php if (isset($errores["contrasena"])): ?>
+                                        <p class="text-danger small"><?php echo $errores["contrasena"] ?></p>
+                                    <?php endif; ?>
+                                    <div id="errorPass" class="text-danger small" style="display: none;">Las contraseñas no coinciden.</div>
+                                </div>
+
+                                <!-- Botón -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-dark mx-auto">Establecer</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    <script>
+        document.getElementById("formulario").addEventListener("submit", function(event) {
+            const pass1 = document.getElementById("contrasena1").value;
+            const pass2 = document.getElementById("contrasena2").value;
+            const errorDiv = document.getElementById("errorPass");
+
+            if (pass1 !== pass2) {
+                event.preventDefault();
+                errorDiv.style.display = "block";
+            } else {
+                errorDiv.style.display = "none";
+            }
+        });
+    </script>
     </body>
     </html>
     <?php

@@ -1,6 +1,11 @@
 <?php
 require_once("../utiles/variables.php");
 require_once("../utiles/funciones.php");
+
+// Activa las sesiones
+session_name("sesion-privada");
+session_start();
+
 //verificar que ha entrado por enlace 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     header("Location: ../index.php");
@@ -10,6 +15,31 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     {
         header("Location: ../index.php");
     }else{
+        //capturamos sesion y  usuario
+        $email = "";
+        $nombre = "";
+        if (isset($_SESSION["email"])){
+            $email = $_SESSION["email"];            
+
+            $conexion = conectarPDO($host, $user, $passwordBD, $bbdd);
+
+            //consulta obtener usuario conectado
+            $consulta = " SELECT id_usuario, nombre, rol_id FROM usuarios WHERE email = ?";
+
+            $consulta = $conexion->prepare($consulta);			
+
+            $consulta->bindParam(1, $email);
+
+            $consulta->execute();
+            
+            $resultado = $consulta->fetch();
+
+            $nombre = $resultado["nombre"];
+
+            $consulta= null;
+            $conexion = null;
+        }
+
         $rally = $_GET["rally"];
 
         //Conectamos a la BBDD para comprobar rally
@@ -50,21 +80,28 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Ranking Rally</title>
             <link rel="stylesheet" type="text/css" href="../css/estilos.css">
+            <link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">    
             <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         </head>
-        <body>	
-            <header>
-                <nav>
-                    <a href='<?php echo "rally.php?rally=$rally"; ?>' class='estilo_enlace'><button>Volver</button></a>
-                    <a href="../ControlAcceso/cerrar-sesion.php" class='estilo_enlace'><button>Salir</button></a>
+        <body>
+            <header class="sticky-top bg-white shadow-sm">
+                <nav class="d-flex justify-content-between align-items-center w-100 px-3 py-2">
+                    <a href='<?php echo "rally.php?rally=$rally"; ?>'class="btn btn-dark">Volver</a>
+                <?php if ($email != ""): ?>
+                    <div class="text-end">
+                        <span class="me-3 fw-bold">Bienvenido/a <?php echo $nombre ?></span>
+                        <a href="../ControlAcceso/cerrar-sesion.php"  class="btn btn-danger">Salir</a>
+                    </div>
+                <?php endif; ?>
                 </nav>
             </header>
-            <main class="contenido">
-                <?php echo "<h1>Rally $rally - $titulo  $fecha_ini | $fecha_fin</h1>" . PHP_EOL; ?>                
-                <div class="rankings">	
-                    <h2>Rankings y gráficos</h2>
-                    <section class="ranking-fotos">
-                        <h3>Ranking fotografías</h3>
+            <main class="container">
+                <h1 class="text-primary-emphasis text-center my-3"><?php echo $titulo ?></h1>                                
+                <h5 class='text-center fst-italic'>Fecha inicio <?php echo formatoFecha($fecha_ini) . "  |  Fecha fin " . formatoFecha($fecha_fin); ?> </h5>               
+                <div class="row my-4 justify-content-around">	    
+                    <section class="col-md-5 col-12 shadow rounded p-4">
+                        <h3 class="my-3">Ranking fotografías</h3>
                         <?php
                         //fotos del rally ordenadas por puntuación
                         $select = "SELECT f.*, u.nombre, u.apellidos FROM fotos f JOIN usuarios u 
@@ -80,42 +117,41 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                         // comprobamos si algún registro 
                         if ($consulta->rowCount() == 0)
                         {
-                            echo "<h3>No hay imágenes disponibles en estos momentos</h3>" . PHP_EOL;
+                            echo "<h5>No hay imágenes disponibles en estos momentos</h5>" . PHP_EOL;
                         }else{
                             $pos = 0;
+                            echo "<div class='row g-4'>" . PHP_EOL;
                             while ($resultado = $consulta->fetch(PDO::FETCH_ASSOC)) {
-                                $pos++;
-                                echo "<article class='foto'>" . PHP_EOL;
-                                echo "<img src='../$resultado[url]' alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;
-                                echo "<p>#$pos <span class='fotoId'>Foto$resultado[id_foto]</span></p>" . PHP_EOL;                               
-                                echo "<p class='participante'>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
-                                echo "<p>Votos <span class='puntos'>$resultado[puntos]</span></p>" . PHP_EOL;
-                                echo "</article>". PHP_EOL;
-                                
+                                $pos++;                           
+								echo "<div class='card h-100 border-light p-0'>" . PHP_EOL;
+                                    echo "<div class='row g-0'>" . PHP_EOL;
+                                        echo "<div class='col-6'>" . PHP_EOL;
+                                            echo "<img src='../$resultado[url]' class='img-fluid object-fit-cover rounded-start'  alt='Foto $resultado[id_foto]'></img>" . PHP_EOL;
+                                        echo "</div>" . PHP_EOL;
+                                        echo "<div class='col-6'>" . PHP_EOL; 
+                                            echo "<div class='card-body d-flex flex-column'>" . PHP_EOL;
+                                                echo "<p class='card-text fs-4'><strong>#$pos</strong> <span class='fotoId'>Foto$resultado[id_foto]</span></p>" . PHP_EOL;                               
+                                                echo "<p class='card-text fst-italic text-secondary participante'>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
+                                                echo "<p class='card-text'><strong>Votos:</strong> <span class='puntos'>$resultado[puntos]</span></p>" . PHP_EOL;                                            
+                                            echo "</div>" . PHP_EOL; 
+                                        echo "</div>" . PHP_EOL; 
+                                    echo "</div>" . PHP_EOL; 
+                                echo "</div>" . PHP_EOL; 
                             } 
-                                
+                            echo "</div>" . PHP_EOL;    
                         }
                         
                         ?>
                     </section>
-                    <section class="ranking-usuarios">
-                    <h3>Ranking participantes</h3>
+                    <section class="col-md-5 col-12 shadow rounded p-4">
+                        <h3 class="my-3">Ranking participantes</h3>
                         <?php
                          //obtener la foto con más puntos de cada usuario
-                         $consulta = 
-                         "SELECT f.puntos, u.nombre, u.apellidos, u.img FROM fotos f, usuarios u
-                         WHERE f.usuario_id= u.id_usuario
-                         AND f.puntos = (
-                             SELECT MAX(puntos) FROM fotos
-                             WHERE usuario_id = f.usuario_id AND rally_id = :id
-                         )
-                         AND id_foto = (
-                             SELECT MIN(id_foto) FROM fotos
-                             WHERE usuario_id = f.usuario_id AND puntos = f.puntos AND rally_id = :id
-                         )
-                         AND f.estado = 'aceptada'
-                         ORDER BY f.puntos DESC;";
-
+                         $consulta =
+                          "SELECT SUM(f.puntos) as puntos, u.nombre, u.apellidos, u.img FROM fotos f, usuarios u
+                         WHERE f.usuario_id= u.id_usuario AND f.rally_id = :id
+                         GROUP BY u.id_usuario
+                         ORDER BY SUM(f.puntos) DESC;";
 
                         $consulta = $conexion->prepare($consulta);
 
@@ -126,34 +162,57 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                         // comprobamos si algún registro 
                         if ($consulta->rowCount() == 0)
                         {
-                            echo "<h3>No hay imágenes disponibles en estos momentos</h3>" . PHP_EOL;
+                            echo "<h5>No hay imágenes disponibles en estos momentos</h5>" . PHP_EOL;
                         }else{
                             $pos = 0;
+                            echo "<div class='row g-4'>" . PHP_EOL;
                             while ($resultado = $consulta->fetch(PDO::FETCH_ASSOC)) {
                                 $pos++;
-                                echo "<article class='usuario'>" . PHP_EOL;
-                                echo "<p>#$pos</p>" . PHP_EOL;                               
-                                echo "<p>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
-                                echo "<p>Votos $resultado[puntos]</p>" . PHP_EOL;
-                                if ($resultado["img"] != null) {
-                                    echo "<img class='avatar' src='../$resultado[img]' alt='Foto perfil usuario'/>" . PHP_EOL ;
-                                }else{
-                                    echo "<img class='avatar' src='../img/avatar.svg' alt='Foto avatar'/>" . PHP_EOL; 
-                                }                              
-                                echo "</article>". PHP_EOL;
-                                
+                                echo "<div class='card h-100 border-light p-0'>" . PHP_EOL;                                
+                                    echo "<div class='row g-0'>" . PHP_EOL;
+                                        echo "<div class='col-1'>" . PHP_EOL;                                            
+                                            echo "<p class='card-text fs-4'><strong>#$pos</strong></p>" . PHP_EOL;                                            
+                                        echo "</div>". PHP_EOL;
+                                        echo "<div class='col-2'>" . PHP_EOL;
+                                            if ($resultado["img"] != null) {
+                                                echo "<img class='avatar' src='../$resultado[img]' alt='Foto perfil usuario'/>" . PHP_EOL ;
+                                            }else{
+                                                echo "<img class='avatar' src='../img/avatar.svg' alt='Foto avatar'/>" . PHP_EOL; 
+                                            } 
+                                        echo "</div>". PHP_EOL;
+                                        echo "<div class='col-4'>" . PHP_EOL;                                            
+                                            echo "<p class='card-text fst-italic text-secondary'>$resultado[nombre] $resultado[apellidos]</p>" . PHP_EOL;
+                                        echo "</div>". PHP_EOL;                            
+                                        echo "<div class='col-5'>" . PHP_EOL;     
+                                            echo "<p class='card-text'><strong>Votos totales:</strong> $resultado[puntos]</p>" . PHP_EOL;
+                                        echo "</div>". PHP_EOL;        
+                                    echo "</div>". PHP_EOL;                              
+                                echo "</div>". PHP_EOL;                                
                             } 
-                                
+                            echo "</div>". PHP_EOL;   
                         }
 
                         ?>
-
                     </section>
                 </div>
-                <div class="graficos">
-                    <section id="graficoPie"></section>
-                    <section id="graficoColumnas"></section>
+                <div class="row g-4 justify-content-center my-4">
+                <!-- Gráfico de Pastel -->
+                <section class="col-12 col-md-8 col-lg-6">
+                    <div class="card shadow-sm p-4">
+                    <h5 class="text-center mb-3">Votos por Usuario</h5>
+                    <div id="graficoPie"></div>
+                    </div>
+                </section>
+
+                <!-- Gráfico de Columnas -->
+                <section class="col-12 col-md-8 col-lg-6">
+                    <div class="card shadow-sm p-4">
+                    <h5 class="text-center mb-3">Puntos por Participante</h5>
+                    <div id="graficoColumnas"></div>
+                    </div>
+                </section>
                 </div>
+
             </main>
         
         <?php
@@ -162,7 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
             include '../utiles/footer.php';
         ?>
-    <script type="text/javascript">
+    <script>
         //ejecutar con el documento completamente cargado
         document.addEventListener('DOMContentLoaded', function () {
             //captura nombre y puntos de las fotos participantes en el rally
@@ -206,6 +265,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             // Callback que crea y rellena de datos, instancia el grafico, pasa los datos y dibuja
             function drawChartPie() {
 
+                const container = document.getElementById('graficoPie');
+                const width = container.offsetWidth;
+                const height = width;
+
+
+                const options = {width: width, height: height};
+
                 // crea la tabla de datos.
                 const data = new google.visualization.DataTable();
                 data.addColumn('string', 'Participante');
@@ -217,12 +283,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                     ]);
                 });
                
-
-                // opciones del grafico
-                const options = {'title':'Votos obtenidos por cada usuario',
-                                'width':800,
-                                'height':600};
-
                 // instancia y dibuja el grafico.
                 const chart = new google.visualization.PieChart(document.getElementById('graficoPie'));
                 chart.draw(data, options);
@@ -230,6 +290,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
             function drawChartColumnas() {
                 const data = new google.visualization.DataTable();
+
+                const container = document.getElementById('graficoColumnas');
+                const width = container.offsetWidth;
+                const height = width;
                 
                 data.addColumn('string', 'Participante');
 
@@ -257,15 +321,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 data.addRows(filas);
 
                 const options = {
-                    title: 'Puntos por participante y foto',
-                    width: 900,
-                    height: 600,
-                    isStacked: true,
+                    isStacked: true,                    
+                    width: width,
+                    height: height,
                     hAxis: {
                         title: 'Participantes'
                     },
                     vAxis: {
-                        title: 'Puntos'
+                        title: 'Puntos',
+                        format: '0'
                     },
                     legend: { position: 'top', maxLines: 3 }
                 };
@@ -273,8 +337,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
                 const chart = new google.visualization.ColumnChart(document.getElementById('graficoColumnas'));
                 chart.draw(data, options);
             }
-
-        });      
+        }); 
+        
+        window.addEventListener('resize', () => {
+            drawChartColumnas();
+            drawChartPie(); 
+        });
     </script>
   
             </body>

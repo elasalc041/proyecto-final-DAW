@@ -27,6 +27,7 @@ if (!isset($_SESSION["email"])){
 
     // Guardo el perfil
     $perfil = (int) $resultado["rol_id"];
+	$nombre = $resultado["nombre"];
 
 
 	if ($perfil != 1) {
@@ -274,154 +275,188 @@ if (!isset($_SESSION["email"])){
 		else
 		{			
 	?>
-			<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta http-equiv="X-UA-Compatible" content="IE=edge">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>Modificar Rally</title>
-				<link rel="stylesheet" type="text/css" href="../css/estilos.css">
-			</head>
-			<body>
-			<body>
-				
-				<header>
-					<nav>
-						<a href='../administrador/listados.php' class='estilo_enlace'><button>Volver</button></a>
-						<a href="../ControlAcceso/cerrar-sesion.php" class='estilo_enlace'><button>Salir</button></a>
-					</nav>
-				</header>
-				<main class="contenedor">	
-				<h1>Modificar Rally</h1>
-
-					<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
-						<input type="hidden" name="id" value="<?php echo $rally ?>">
-						<input type="hidden" name="imagen_actual" value="<?php echo $rutaFoto ?>">
-						<div>
-							<!-- Campo fechas -->
-							<p>					
-								<label for="fecha_ini">Fecha inicio Rally</label>	 
-								<input type="date" name="fecha_ini" value="<?php echo $fecha_ini ?>" required>
-							</p>
-							<p>					
-								<label for="fecha_fin">Fecha final Rally</label>	 
-								<input type="date" name="fecha_fin" value="<?php echo $fecha_fin ?>" required>
-							</p>				
-								<?php
-									if (isset($errores["fechas"])):
-								?>
-									<p class="error"><?php echo $errores["fechas"]?></p>
-								<?php
-									endif;
-								?>				
-						</div>
-						<p>
-							<!-- Campo nombre -->
-							<label for="titulo">Título</label>
-							<input type="text" name="titulo" placeholder="Título" value="<?php echo $titulo ?>" required>
-							<?php
-								if (isset($errores["titulo"])):
-							?>
-								<p class="error"><?php echo $errores["titulo"] ?></p>
-							<?php
-								endif;
-							?>
-						</p>
-						<p>
-							<!-- Campo localidad -->
-							<label for="localidad">Localidad</label>
-							<input type="text" name="localidad" placeholder="Localidad" value="<?php echo $localidad ?>" required>
-							<?php
-								if (isset($errores["localidad"])):
-							?>
-								<p class="error"><?php echo $errores["localidad"] ?></p>
-							<?php
-								endif;
-							?>
-						</p>
-						<p>
-							<!-- Campo descripción -->
-							<label for="descripcion">Descripción</label>
-							<textarea name="descripcion" rows="10" cols="50" placeholder="Descripcion" maxlength="600" required><?php echo $descripcion ?></textarea>
-						</p>		
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Modificar Rally</title>
+	<link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../css/estilos.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">    
+</head>
+<body>	
+	<header class="sticky-top bg-white shadow-sm">
+		<nav class="d-flex justify-content-between align-items-center w-100 px-3 py-2">
+			<a href='../administrador/listados.php'class="btn btn-dark">Volver</a>
+		<?php if ($email != ""): ?>
+			<div class="text-end">
+				<span class="me-3 fw-bold">Bienvenido/a <?php echo $nombre ?></span>
+				<a href="../ControlAcceso/cerrar-sesion.php"  class="btn btn-danger">Salir</a>
+			</div>
+		<?php endif; ?>
+		</nav>
+	</header>
+	<main class="container">
+		<div class="min-vh-100 d-flex justify-content-center align-items-center">	
+			<div class="card shadow-sm p-4 my-4">	
+				<h2 class="text-primary-emphasis mb-3">Modificar Rally</h2>
+				<form id="formulario" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+					<input type="hidden" name="id" value="<?php echo $rally ?>">
+					<input type="hidden" name="imagen_actual" value="<?php echo $rutaFoto ?>">
+					<div class="mb-3">
+						<!-- Campo fechas -->
+						<div class="row gap-3">
+							<div class="col-12 col-md-5">					
+								<label for="fecha_ini" class="form-label fw-bold">Fecha inicio*</label>	 
+								<input type="date" name="fecha_ini" class="form-control" value="<?php echo $fecha_ini ?>" required>
+							</div>
+							<div class="col-12 col-md-5">					
+								<label for="fecha_fin" class="form-label fw-bold">Fecha final*</label>	 
+								<input type="date" name="fecha_fin" class="form-control" value="<?php echo $fecha_fin ?>" required>
+							</div>							 
+							</div>						
+						<?php
+							if (isset($errores["fechas"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["fechas"]?></p>
+						<?php
+							endif;
+						?>		
+					</div>
+					<div class="mb-3">
+						<!-- Campo nombre -->
+						<label for="titulo" class="form-label fw-bold">Título*</label>
+						<input type="text" class="form-control" name="titulo" placeholder="Título" value="<?php echo $titulo ?>" required>
+						<?php
+							if (isset($errores["titulo"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["titulo"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>
+					<div class="mb-3">
+						<!-- Campo localidad -->
+						<label for="localidad" class="form-label fw-bold">Localidad*</label>
+						<input type="text" class="form-control" name="localidad" placeholder="Localidad" value="<?php echo $localidad ?>" required>
+						<?php
+							if (isset($errores["localidad"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["localidad"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>
+					<div class="mb-3">
+						<!-- Campo descripción -->
+						<label for="descripcion" class="form-label fw-bold">Descripción*</label>
+						<textarea name="descripcion" class="form-control" rows="10" cols="50" placeholder="Descripcion" maxlength="600" required><?php echo $descripcion ?></textarea>
+					</div>				
+					<div class="mb-3">
+						<!-- número de participantes -->
+						<label for="participantes" class="form-label fw-bold">Nº participantes*</label>
+						<input type="number" class="form-control" name="participantes" value="<?php echo $participantes ?>" min="1" max="1000" required>
+						<?php
+							if (isset($errores["participantes"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["participantes"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>
+					<div class="mb-3">
+						<!-- número de fotos -->
+						<label for="lim_fotos" class="form-label fw-bold">Límite fotos por participante*</label>
+						<input type="number" class="form-control" name="lim_fotos" value="<?php echo $lim_fotos ?>" min="1" max="100" required>
+						<?php
+							if (isset($errores["lim_fotos"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["lim_fotos"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>
+					<div class="mb-3">
+						<!-- tamaño de fotos -->
+						<label for="tam_foto" class="form-label fw-bold">Tamaño foto permitido*</label>
+						<input type="number" class="form-control" name="tam_foto" value="<?php echo $tam_foto ?>" min="1" max="2000" required>
+						<?php
+							if (isset($errores["tam_foto"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["tam_foto"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>
+					<div class="mb-3">
+						<!-- Campo formato imagen -->
+						<select id="formato" name="formato_foto" class="form-select fw-bold" required >
+							<option value="">Seleccione Formato Foto*</option>
+							<option value="png" <?php echo "png" == $formato_foto ? "selected" : "" ?>>PNG</option>
+							<option value="jpeg" <?php echo "jpeg" == $formato_foto ? "selected" : "" ?>>JPEG</option>
+							<option value="svg" <?php echo "svg" == $formato_foto ? "selected" : "" ?>>SVG</option>
+							<option value="gif" <?php echo "gif" == $formato_foto ? "selected" : "" ?>>GIF</option>
+						</select>
 						
-						<p>
-							<!-- número de participantes -->
-							<label for="participantes">Nº participantes</label>
-							<input type="number" name="participantes" value="<?php echo $participantes ?>" min="1" max="1000" required>
-							<?php
-								if (isset($errores["participantes"])):
-							?>
-								<p class="error"><?php echo $errores["participantes"] ?></p>
-							<?php
-								endif;
-							?>
-						</p>
-						<p>
-							<!-- número de fotos -->
-							<label for="lim_fotos">Límite fotos por participante</label>
-							<input type="number" name="lim_fotos" value="<?php echo $lim_fotos ?>" min="1" max="100" required>
-							<?php
-								if (isset($errores["lim_fotos"])):
-							?>
-								<p class="error"><?php echo $errores["lim_fotos"] ?></p>
-							<?php
-								endif;
-							?>
-						</p>
-						<p>
-							<!-- tamaño de fotos -->
-							<label for="tam_foto">Tamaño foto permitido</label>
-							<input type="number" name="tam_foto" value="<?php echo $tam_foto ?>" min="1" max="20000" required>
-							<?php
-								if (isset($errores["tam_foto"])):
-							?>
-								<p class="error"><?php echo $errores["tam_foto"] ?></p>
-							<?php
-								endif;
-							?>
-						</p>
-						<p>
-							<!-- Campo formato imagen -->
-							<select id="formato" name="formato_foto" required >
-								<option value="">Seleccione Formato Foto</option>
-								<option value="png" <?php echo "png" == $formato_foto ? "selected" : "" ?>>PNG</option>
-								<option value="jpeg" <?php echo "jpeg" == $formato_foto ? "selected" : "" ?>>JPEG</option>
-								<option value="svg" <?php echo "svg" == $formato_foto ? "selected" : "" ?>>SVG</option>
-								<option value="gif" <?php echo "gif" == $formato_foto ? "selected" : "" ?>>GIF</option>
-							</select>
-							
-							<?php
-								if (isset($errores["formato_foto"])):
-							?>
-								<p class="error"><?php echo $errores["formato_foto"] ?></p>
-							<?php
-								endif;
-							?>
-						</p>
-						<p>
-							<!-- Subida de imagen -->
-							<label for="imagen">Imagen del rally:</label>
-							<input type="file" name="imagen" accept="image/*">
-							<?php
-								if (isset($errores["imagen"])):
-									{	
-							?>
-								<p class="error"><?php echo $errores["imagen"] ?></p>
-							<?php
-									}
-								endif;
-							?>
-						</p>		
-						<p>
-							<!-- Botón submit -->
-							<input type="submit" value="Registrar">
-						</p>
-					</form>						
-				</main>
-			</body>
-			</html>
+						<?php
+							if (isset($errores["formato_foto"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["formato_foto"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>
+					<div class="mb-3">
+						<!-- Subida de imagen -->
+						<label for="imagen" class="form-label fw-bold">Imagen del rally:</label>
+						<input type="file" id="imagen" class="form-control" name="imagen" accept="image/*">
+						<?php
+							if (isset($errores["imagen"])):
+								{	
+						?>
+							<p class="text-danger small"><?php echo $errores["imagen"] ?></p>
+						<?php
+								}
+							endif;
+						?>
+					</div>		
+					<div class="d-grid">
+						<!-- Botón submit -->
+						<input type="submit"  class="btn btn-dark mx-auto" value="Modificar">
+					</div>
+				</form>	
+			</div>
+		</div>					
+	</main>
+		<?php
+		include '../utiles/footer.php';
+	?>
+</body>
+<script>
+	//control de imagen en cliente
+	document.getElementById("formulario").addEventListener("submit", (event) => {
+		const input = document.getElementById("imagen");
+		const file = input.files[0];
+
+		if (file) {
+			const tamMax = 10; // Límite de 10 MB
+			const formatos = ['image/jpeg', 'image/png', 'image/gif', 'image/svg'];
+
+			if (!formatos.includes(file.type)) {
+				alert("Por favor, selecciona un archivo de imagen válido (jpg, png, gif, svg).");
+				event.preventDefault();
+			}
+
+			if (file.size > tamMax * 1024 * 1024) {
+				alert("El archivo es demasiado grande. Debe pesar menos de " + tamMax + " MB.");
+				event.preventDefault();
+			}
+		}
+	});
+</script>
+</html>
 
 <?php
 			} //cierre else errores

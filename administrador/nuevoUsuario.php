@@ -28,6 +28,7 @@ if (!isset($_SESSION["email"])){
 
     // Guardo el perfil
     $perfil = (int) $resultado["rol_id"];
+	$nombreAdmin = $resultado["nombre"];
 
 
 	if ($perfil != 1) {
@@ -106,7 +107,7 @@ if (!isset($_SESSION["email"])){
 
 	        }
 
-			if ($tfno != null && validarEnteroLimites($tfno, 600000000, 799999999))
+			if ($tfno != null && !validarEnteroLimites($tfno, 600000000, 799999999))
 	        {
 				$errores["tfno"] = "Campo tetéfono no es correcto.";
 				$tfno = null;
@@ -168,86 +169,97 @@ if (!isset($_SESSION["email"])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alta nuevo usuario</title>
+    <link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="../css/estilos.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">    
 </head>
 <body>
-	<header>
-        <nav>
-            <a href='listados.php' class='estilo_enlace'><button>Volver</button></a>
-            <a href="../ControlAcceso/cerrar-sesion.php" class='estilo_enlace'><button>Salir</button></a>
-        </nav>
+	<header class="sticky-top bg-white shadow-sm">
+		<nav class="d-flex justify-content-between align-items-center w-100 px-3 py-2">
+			<a href='listados.php'class="btn btn-dark">Volver</a>
+		<?php if ($email != ""): ?>
+			<div class="text-end">
+				<span class="me-3 fw-bold">Bienvenido/a <?php echo $nombreAdmin ?></span>
+				<a href="../ControlAcceso/cerrar-sesion.php"  class="btn btn-danger">Salir</a>
+			</div>
+		<?php endif; ?>
+		</nav>
 	</header>
-    <main class="contenido">
-    <h1>Alta de un nuevo usuario</h1>
-
-			<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-			<p>
-	            <!-- Campo nombre nuevo -->
-				<label for="nombre">Nombre*: </label>
-	            <input type="text" name="nombre" placeholder="nombre" value="<?php echo $nombre ?>" required>
-	            <?php
-	            	if (isset($errores["nombre"])):
-	            ?>
-	            	<p class="error"><?php echo $errores["nombre"] ?></p>
-	            <?php
-	            	endif;
-	            ?>
-	        </p>
-			<p>
-	            <!-- Campo apellidos -->
-				<label for="apellidos">Apellidos*: </label>
-	            <input type="text" name="apellidos" placeholder="apellidos" value="<?php echo $apellidos ?>" required>
-	            <?php
-	            	if (isset($errores["apellidos"])):
-	            ?>
-	            	<p class="error"><?php echo $errores["apellidos"] ?></p>
-	            <?php
-	            	endif;
-	            ?>
-	        </p>	
-	    	<p>
-	            <!-- Campo email nuevo -->
-				<label for="email">Email*: </label>
-	            <input type="email" name="email" placeholder="ejemplo@email.com" value="<?php echo $emailNuevo ?>" required>
-	            <?php
-	            	if (isset($errores["email"])):
-	            ?>
-	            	<p class="error"><?php echo $errores["email"] ?></p>
-	            <?php
-	            	endif;
-	            ?>
-	        </p>  
-			<p>
-	            <!-- Campo tfno -->
-				<label for="tfno">Teléfono: </label>
-	            <input type="number" name="tfno" placeholder="6xxxxxxxx" value="<?php echo $tfno ?>" min="600000000" max="799999999">
-	            <?php
-	            	if (isset($errores["tfno"])):
-	            ?>
-	            	<p class="error"><?php echo $errores["tfno"] ?></p>
-	            <?php
-	            	endif;
-	            ?>
-	        </p>
-			<p>
-	            <!-- Descripción -->
-				<label for="descr">Descripción: </label>
-	            <textarea name="descr" rows="5" cols="33" placeholder="Añade descripción de ti mismo ..." maxlength="600">
-				</textarea>
-	        </p>
-	        <p>
-	            <!-- Botón submit -->
-	            <input type="submit" value="Registrar">
-	        </p>
-	    </form>
-		</main>
+    <main class="container">
+    	<div class="min-vh-100 d-flex justify-content-center align-items-center">	
+			<div class="card shadow-sm p-4 my-4">
+				<h2 class="text-primary-emphasis">Alta de un nuevo usuario</h2>
+					<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+					<div class="mb-3">
+						<!-- Campo nombre nuevo -->
+						<label for="nombre" class="form-label fw-bold">Nombre*</label>
+						<input type="text" class="form-control" name="nombre" placeholder="nombre" value="<?php echo $nombre ?>" required>
+						<?php
+							if (isset($errores["nombre"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["nombre"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>
+					<div class="mb-3">
+						<!-- Campo apellidos -->
+						<label for="apellidos" class="form-label fw-bold">Apellidos*</label>
+						<input type="text" class="form-control" name="apellidos" placeholder="apellidos" value="<?php echo $apellidos ?>" required>
+						<?php
+							if (isset($errores["apellidos"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["apellidos"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>	
+					<div class="mb-3">
+						<!-- Campo email nuevo -->
+						<label for="email" class="form-label fw-bold">Email*</label>
+						<input type="email" class="form-control" name="email" placeholder="ejemplo@email.com" value="<?php echo $emailNuevo ?>" required>
+						<?php
+							if (isset($errores["email"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["email"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>  
+					<div class="mb-3">
+						<!-- Campo tfno -->
+						<label for="tfno" class="form-label fw-bold">Teléfono</label>
+						<input type="number" class="form-control" name="tfno" placeholder="6xxxxxxxx" value="<?php echo $tfno ?>" min="600000000" max="799999999">
+						<?php
+							if (isset($errores["tfno"])):
+						?>
+							<p class="text-danger small"><?php echo $errores["tfno"] ?></p>
+						<?php
+							endif;
+						?>
+					</div>
+					<div class="mb-3">
+						<!-- Descripción -->
+						<label for="descr" class="form-label fw-bold">Descripción</label>
+						<textarea class="form-control" name="descr" rows="5" cols="33" placeholder="Añade descripción de ti mismo ..." maxlength="600"><?php echo $descripcion ?></textarea>
+					</div>
+					<div class="d-grid">
+						<!-- Botón submit -->
+						<input type="submit" class="btn btn-dark mx-auto" value="Guardar">
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+	<?php
+		include '../utiles/footer.php';
+	?>
 </body>
 </html>
 
 
-	<?php 			
-			endif;
-
+<?php 			
+	endif;
 }
 ?>
 

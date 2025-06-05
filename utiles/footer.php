@@ -3,9 +3,9 @@
     <p style="margin-bottom: 1rem;">&copy; 2025 Concurso Fotográfico. Todos los derechos reservados.</p>
 
     <nav style="margin-bottom: 1rem;">
-      <a href="/terminos" style="color: #ccc; margin: 0 10px; text-decoration: none;">Términos</a>
-      <a href="/privacidad" style="color: #ccc; margin: 0 10px; text-decoration: none;">Privacidad</a>
-      <a href="/contacto" style="color: #ccc; margin: 0 10px; text-decoration: none;">Contacto</a>
+      <a href="#" style="color: #ccc; margin: 0 10px; text-decoration: none;">Términos</a>
+      <a href="#" style="color: #ccc; margin: 0 10px; text-decoration: none;">Privacidad</a>
+      <a href="#" style="color: #ccc; margin: 0 10px; text-decoration: none;">Contacto</a>
     </nav>
 
     <div>

@@ -60,17 +60,23 @@ if (!isset($_SESSION["email"])) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Perfil</title>
+        <link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
         <link rel="stylesheet" type="text/css" href="../css/estilos.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">    
     </head>
 
     <body>
-        <header>
-            <nav>
-                <button><a href='../index.php' class='estilo_enlace'>Volver</a></button>
-                <button><a href="../ControlAcceso/cerrar-sesion.php" class='estilo_enlace'>Salir</a></button>
+        <header class="sticky-top bg-white shadow-sm">
+            <nav class="d-flex justify-content-between align-items-center w-100 px-3 py-2">
+                <a href='../index.php'class="btn btn-dark">Inicio</a>
+            <?php if ($email != ""): ?>
+                <div class="text-end">
+                    <span class="me-3 fw-bold">Bienvenido/a <?php echo $nombre ?></span>
+                    <a href="../ControlAcceso/cerrar-sesion.php"  class="btn btn-danger">Salir</a>
+                </div>
+            <?php endif; ?>
             </nav>
         </header>
-
         <?php
 
         // Realiza la conexion a la base de datos a través de una función 
@@ -87,28 +93,36 @@ if (!isset($_SESSION["email"])) {
 
         ?>
 
-        <main class="contenedor">            
-            <h1>Mi Perfil</h1>
-            <section class="perfil">
-                <?php
-                    echo "<h3>Usuario: $nombre $apellidos</h3>" . PHP_EOL;
-                    echo "<p>$descripcion</p>"  . PHP_EOL;
-                    echo "<a href='modificar.php?id=$id'><button>Modificar Perfil</button></a>". PHP_EOL;
-                    if ($img != null) {                       
-                        echo "<img src='../$img' alt='Foto perfil'></img>" . PHP_EOL;
-                    }else{
-                        echo "<img src='../img/avatar.svg' alt='Foto avatar anónimo'></img>" . PHP_EOL;
-                    }
-                ?>                
+        <main class="container">            
+            <h1 class="text-primary-emphasis mt-4">Mi Perfil</h1>
+            <section class="row align-items-center g-4 mb-4">
+                <div class="col-12 col-md-6">
+                    <div class="card shadow-sm p-4 h-100">
+                    <?php
+                        echo "<h3 class='card-title mb-3'>$nombre $apellidos</h3>" . PHP_EOL;
+                        echo "<p class='card-text'>$descripcion</p>"  . PHP_EOL;
+                        echo "<a href='modificar.php?id=$id' class='btn btn-dark mt-3 mx-auto'>Modificar datos</a>". PHP_EOL;
+                        
+                    ?> 
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
+                    <div class="card p-4 border-light" style="min-height: 250px; min-width: 250px;">
+                <?php  
+                        if ($img != null && $img != "") {                       
+                            echo "<img src='../$img' alt='Foto perfil' class='img-fluid' style='max-width: 250px; height: auto;'>" . PHP_EOL;
+                        }else{
+                            echo "<img src='../img/avatar.svg' alt='Foto perfil' class='img-fluid' style='max-width: 250px; height: auto;'>" . PHP_EOL;
+                        }
+                ?>
+                    </div>
+                </div>
             </section>
-            <section class="registros">
-                <article>                    
-                    <h2>Rallies Inscrito</h2>
-                    
-                        <!-- Muestra los datos -->
+            <section class="row justify-content-around g-4 my-4">
+                <div class="col-12 col-md-5 shadow rounded p-4">                    
+                    <h2 class="my-3">Rallies Inscrito</h2>
                         <?php
                         $participado = [];
-
                         while ($registro = $resultado->fetch(PDO::FETCH_ASSOC)) {
 
                             $apuntado = false;
@@ -121,27 +135,28 @@ if (!isset($_SESSION["email"])) {
                                 }
                             }
 
-                            //solo mostrar rallies que no haya pasado la fecha aún y se encuentre apuntado
-                            if ($registro["fecha_fin"] >= $fechaActual && $apuntado) {
-
-                                //obtener posición de la foto con más puntos del usuario para cada rally
+                             //obtener posición de la foto con más puntos del usuario para cada rally
                                 $consulta2 = 
                                 "SELECT * FROM fotos f
                                 WHERE puntos = (
                                     SELECT MAX(puntos) FROM fotos
-                                    WHERE usuario_id = f.usuario_id AND rally_id = $registro[id_rally]
+                                    WHERE usuario_id = f.usuario_id AND rally_id = $registro[id_rally] 
                                 )
                                 AND id_foto = (
                                     SELECT MIN(id_foto) FROM fotos
-                                    WHERE usuario_id = f.usuario_id AND puntos = f.puntos AND rally_id = $registro[id_rally]
+                                    WHERE usuario_id = f.usuario_id AND puntos = f.puntos AND rally_id = $registro[id_rally] 
                                 )
+                                AND estado = 'aceptada'
                                 ORDER BY puntos DESC;";
-
 
                                 $resultado2 = $conexion->query($consulta2);
 
+                            //solo mostrar rallies que no haya pasado la fecha aún y se encuentre apuntado
+                            if ($registro["fecha_fin"] >= $fechaActual && $apuntado) {
+
                                 $ranking = 0;
                                 $flag = false;
+                                $votos = 0;
                                 while (($registro2 = $resultado2->fetch(PDO::FETCH_ASSOC)) && !$flag) {
                                     $ranking++;
                                     if ($registro2["usuario_id"] == $id) {
@@ -150,56 +165,74 @@ if (!isset($_SESSION["email"])) {
                                     }
                                 }
 
-                                echo "<div class='tarjeta'> " . PHP_EOL;
-                                echo "<h3>Rally $registro[id_rally] - $registro[titulo]</h3>" . PHP_EOL;
-                                echo "<p> " . formatoFecha($registro["fecha_ini"]) . " | " . formatoFecha($registro["fecha_fin"]) . PHP_EOL;
-                                if ($flag) {
-                                    echo "Ranking foto mayor puntuación: $ranking. Votos: $votos</p>" . PHP_EOL;
-                                }else{
-                                    echo "Ninguna foto subida</p>" . PHP_EOL;
-                                }
-                                echo "<a href='../rally/rally.php?rally=$registro[id_rally]' class='estilo_enlace'><button>Ir</button></a>". PHP_EOL;
+                                echo "<div class='row g-4 mb-4'> " . PHP_EOL;
+                                    echo "<div class='card h-100 border-light p-2'>" . PHP_EOL;
+                                        echo "<div class='row g-0'>" . PHP_EOL;
+                                            echo "<div class='col-10'>" . PHP_EOL;
+                                                echo "<h5 class='card-text'>$registro[titulo]</h5>" . PHP_EOL;
+                                                echo "<p class='card-text fst-italic text-secondary'> " . formatoFecha($registro["fecha_ini"]) 
+                                                . " | " . formatoFecha($registro["fecha_fin"]) . "</p>" . PHP_EOL;
+                                                if ($flag) {
+                                                    echo "<p class='card-text'>Puesto foto mayor puntuación: $ranking. <strong>Votos:</strong> $votos</p>" . PHP_EOL;
+                                                }else{
+                                                    echo "<p class='card-text'>Ninguna foto subida</p>" . PHP_EOL;
+                                                }
+                                            echo "</div> " . PHP_EOL;
+                                            echo "<div class='col-2'>" . PHP_EOL;   
+                                                echo "<a href='../rally/rally.php?rally=$registro[id_rally]' class='btn btn-outline-primary mt-3 mx-auto'>Ir</a>". PHP_EOL;
+                                            echo "</div> " . PHP_EOL;
+                                        echo "</div> " . PHP_EOL;
+                                    echo "</div> " . PHP_EOL;
                                 echo "</div> " . PHP_EOL;
 
                              //concursos ya pasados y estuviera apuntado   
                             }elseif ($registro["fecha_fin"] < $fechaActual && $apuntado) {
-                               
-                                //obtener posición de la foto con más puntos del usuario para cada rally
-                               $consulta2 = "SELECT usuario_id FROM fotos 
-                               WHERE rally_id = $registro[id_rally]
-                               ORDER BY puntos DESC";
-
-                               $resultado2 = resultadoConsulta($conexion, $consulta2);
 
                                $ranking = 0;
                                $flag = false;
+                               $votos = 0;
                                while (($registro2 = $resultado2->fetch(PDO::FETCH_ASSOC)) && !$flag) {
                                    $ranking++;
                                    if ($registro2["usuario_id"] == $id) {
                                       $flag = true;
+                                      $votos = $registro2["puntos"];
                                    }
                                }
 
-                               $participado[] = "
-                               <h3>Rally $registro[id_rally] - $registro[titulo]</h3>
-                               <p> " . formatoFecha($registro["fecha_fin"]) .
-                                "| Ranking: $ranking</p> " . PHP_EOL;
-                            }
+                               $noFoto= "<p class='card-text'>Ninguna foto subida</p>" . PHP_EOL;
+                               if ($flag) {
+                                  $noFoto= "<p class='card-text'>Puesto foto mayor puntuación: $ranking. <strong>Votos:</strong> $votos</p>" . PHP_EOL;
+                                }
 
+                               $participado[] = "
+                               <div class='col-10'>
+                                    <h5 class='card-text'>$registro[titulo]</h5>
+                                    <p class='card-text fst-italic text-secondary'> " . formatoFecha($registro["fecha_ini"]) 
+                                            . " | " . formatoFecha($registro["fecha_fin"]) . "</p>
+                                    $noFoto
+                                </div>
+                               <div class='col-2'>   
+                                    <a href='../rally/rally.php?rally=$registro[id_rally]' class='btn btn-dark mt-3 mx-auto'>Ir</a>
+                                </div>"  . PHP_EOL;
+                            }
                         }
                         ?>
-                </article>
-                <article>
-                    <h2>Rallies Participado</h2>
+                </div>
+                <div class="col-12 col-md-5 shadow rounded p-4">
+                    <h2 class="my-3">Rallies Participado</h2>
                     <?php
                         foreach ($participado as $valor) {
-                            echo "<div class='tarjeta'>" . PHP_EOL;
-                            echo $valor;
+                        echo "<div class='row g-4 mb-4'> " . PHP_EOL;
+                            echo "<div class='card h-100 border-light p-2'>" . PHP_EOL;
+                                echo "<div class='row g-0'>" . PHP_EOL;
+                                    echo $valor;
+                                echo "</div> " . PHP_EOL;
                             echo "</div> " . PHP_EOL;
+                        echo "</div> " . PHP_EOL;
                         }
                     ?>
                     
-                </article>
+                </div>
             </section>
         </main>
 
