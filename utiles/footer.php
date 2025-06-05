@@ -1,4 +1,4 @@
-<footer style="background-color: #222; color: #fff; padding: 2rem 1rem; text-align: center;">
+<footer class="d-none d-lg-block text-center" style="background-color: #222; color: #fff; padding: 2rem 1rem;">
   <div style="max-width: 1200px; margin: auto;">
     <p style="margin-bottom: 1rem;">&copy; 2025 Concurso Fotográfico. Todos los derechos reservados.</p>
 
