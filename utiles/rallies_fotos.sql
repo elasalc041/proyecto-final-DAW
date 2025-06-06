@@ -68,7 +68,7 @@ CREATE TABLE `rally` (
   `participantes` int(11) NOT NULL,
   `img` varchar(256) DEFAULT NULL,
   `localidad` varchar(256) NOT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 

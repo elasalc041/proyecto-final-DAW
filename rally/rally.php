@@ -269,7 +269,7 @@ if (count($_REQUEST) > 0)
 
 									if ($fechaActual >= $resultado["fecha_ini"] && $fechaActual <= $resultado["fecha_fin"]) {								
 										echo "
-										<form class='mx-auto' action='votar.php' method='POST'>
+										<form class='mx-auto formVotar' action='votar.php' method='POST'>
 											<input type='hidden' name='id_foto' value='$resultado[id_foto]'>
 											<input type='hidden' name='rally_id' value='$resultado[rally_id]'>
 											<button class='btn btn-success' type='submit'>Votar</button>
