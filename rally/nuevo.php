@@ -198,7 +198,7 @@ if (!isset($_SESSION["email"])){
 				$directorio = "../uploads/rallies/$rally/";
 
 				if (!is_dir($directorio)) {
-					mkdir($directorio);
+					mkdir($directorio, 0777, true);
 				}
 
 				//si imagen ha sido subida, cargamos al sevidor y actualizamos registro

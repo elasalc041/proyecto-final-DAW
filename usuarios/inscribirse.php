@@ -113,7 +113,7 @@ if (!isset($_SESSION["email"])){
 				    $directorio = "../uploads/usuarios/$id/rallies/$rally/";
 
                     if (!is_dir($directorio)) {
-                        mkdir($directorio);
+                        mkdir($directorio, 0777, true);
                     }
 
                 } catch (PDOException $e) {

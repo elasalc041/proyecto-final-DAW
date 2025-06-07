@@ -147,9 +147,9 @@ if (!isset($_SESSION["email"])){
 			//crear carpeta usuario
 			$usuario =  $conexion->lastInsertId();	
 
-			mkdir("../uploads/usuarios/$usuario/");
-			mkdir("../uploads/usuarios/$usuario/perfil");
-			mkdir("../uploads/usuarios/$usuario/rallies");
+			mkdir("../uploads/usuarios/$usuario/", 0777, true);
+			mkdir("../uploads/usuarios/$usuario/perfil", 0777, true);
+			mkdir("../uploads/usuarios/$usuario/rallies", 0777, true);
 
 
 

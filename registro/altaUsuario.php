@@ -55,9 +55,9 @@ if (!isset($_SESSION["emailNuevo"]) || !isset($_SESSION["apellidos"])  || !isset
    
         $id = (int) $resultado["id_usuario"];
 
-		mkdir("../uploads/usuarios/$id/");
-        mkdir("../uploads/usuarios/$id/perfil");
-        mkdir("../uploads/usuarios/$id/rallies");
+		mkdir("../uploads/usuarios/$id/", 0777, true);
+        mkdir("../uploads/usuarios/$id/perfil", 0777, true);
+        mkdir("../uploads/usuarios/$id/rallies", 0777, true);
 
 
 
