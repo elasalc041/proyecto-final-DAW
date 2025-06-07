@@ -115,7 +115,7 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `email`, `clave`, `activo`, `token`, `tfno`, `nombre`, `apellidos`, `rol_id`, `fecha`, `img`, `descripcion`) VALUES
-(1, 'admin@email.com', '$2y$10$ACxHsD/vi2TlP9Hcu1arD.DHSnXrYjxVbO4wa2fvlLj7OKXr.S9oC', 1, '2a849ad2d1d826ae473d8f7a78b8723c', NULL, 'administrador', 'administrador', 1, '2025-04-12', NULL, NULL);
+(1, 'adminer@google.es', '$2y$10$AHERCFpcx25BRMfRLILPoOzcEPNz0UdKhnoUeyzE2Emp/CCtI0jl.', 1, '2a849ad2d1d826ae473d8f7a78b8723c', NULL, 'administrador', 'administrador', 1, '2025-04-12', NULL, NULL);
 
 --
 -- Índices para tablas volcadas
